@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using UniLiving.DataContext;
 
 namespace UniLiving
 {
@@ -11,6 +13,10 @@ namespace UniLiving
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+            // Connection String
+            builder.Services.AddDbContext<UniDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UniLivingContext")));
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 

@@ -6,6 +6,8 @@ namespace UniLiving.DataContext
 {
     public class UniDBContext : DbContext
     {
+        private static readonly DateTime _seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         public UniDBContext(DbContextOptions<UniDBContext> options)
             : base(options)
         {
@@ -205,24 +207,24 @@ namespace UniLiving.DataContext
 
             // Seed default data
             modelBuilder.Entity<Role>().HasData(
-                new Role { Id = 1, Name = "Admin", Description = "System administrator", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-                new Role { Id = 2, Name = "Landlord", Description = "Property owner", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-                new Role { Id = 3, Name = "Tenant", Description = "Tenant/renter", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                new Role { Id = 1, Name = "Admin", Description = "System administrator", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new Role { Id = 2, Name = "Landlord", Description = "Property owner", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new Role { Id = 3, Name = "Tenant", Description = "Tenant/renter", CreatedAt = _seedDate, UpdatedAt = _seedDate }
             );
 
             modelBuilder.Entity<PropertyCategory>().HasData(
-                new PropertyCategory { Id = 1, Name = "Apartment", Description = "Traditional rental apartment", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-                new PropertyCategory { Id = 2, Name = "Dormitory", Description = "Student dormitory", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-                new PropertyCategory { Id = 3, Name = "SharedApartment", Description = "Shared apartment with roommates", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-                new PropertyCategory { Id = 4, Name = "Room", Description = "Single room for rent", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                new PropertyCategory { Id = 1, Name = "Apartment", Description = "Traditional rental apartment", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new PropertyCategory { Id = 2, Name = "Dormitory", Description = "Student dormitory", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new PropertyCategory { Id = 3, Name = "SharedApartment", Description = "Shared apartment with roommates", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new PropertyCategory { Id = 4, Name = "Room", Description = "Single room for rent", CreatedAt = _seedDate, UpdatedAt = _seedDate }
             );
 
             modelBuilder.Entity<NotificationType>().HasData(
-                new NotificationType { Id = 1, Name = "NewMessage", Description = "New message received", DefaultEnabled = true, CreatedAt = DateTime.UtcNow },
-                new NotificationType { Id = 2, Name = "NewProperty", Description = "New property listed", DefaultEnabled = true, CreatedAt = DateTime.UtcNow },
-                new NotificationType { Id = 3, Name = "PropertyApproved", Description = "Property approved", DefaultEnabled = true, CreatedAt = DateTime.UtcNow },
-                new NotificationType { Id = 4, Name = "PropertyRejected", Description = "Property rejected", DefaultEnabled = true, CreatedAt = DateTime.UtcNow },
-                new NotificationType { Id = 5, Name = "NewRating", Description = "New rating received", DefaultEnabled = true, CreatedAt = DateTime.UtcNow }
+                new NotificationType { Id = 1, Name = "NewMessage", Description = "New message received", DefaultEnabled = true, CreatedAt = _seedDate },
+                new NotificationType { Id = 2, Name = "NewProperty", Description = "New property listed", DefaultEnabled = true, CreatedAt = _seedDate },
+                new NotificationType { Id = 3, Name = "PropertyApproved", Description = "Property approved", DefaultEnabled = true, CreatedAt = _seedDate },
+                new NotificationType { Id = 4, Name = "PropertyRejected", Description = "Property rejected", DefaultEnabled = true, CreatedAt = _seedDate },
+                new NotificationType { Id = 5, Name = "NewRating", Description = "New rating received", DefaultEnabled = true, CreatedAt = _seedDate }
             );
         }
     }
