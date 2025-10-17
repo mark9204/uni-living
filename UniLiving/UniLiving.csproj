@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\UniLiving.DataContext\UniLiving.DataContext.csproj" />
     <ProjectReference Include="..\UniLiving.Services\UniLiving.Services.csproj" />
   </ItemGroup>

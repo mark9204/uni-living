@@ -25,5 +25,6 @@ namespace UniLiving.DataContext.DTOs
         public PropertyCategoryDto Category { get; set; } = null!;
         public List<PropertyImageDto> Images { get; set; } = new();
         public UserDto Owner { get; set; } = null!;
+        public object OwnerName { get; set; }
     }
 }
