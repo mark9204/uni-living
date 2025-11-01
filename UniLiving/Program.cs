@@ -26,6 +26,8 @@ namespace UniLiving
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPropertyService, PropertyService>();
+            builder.Services.AddScoped<IUserRatingService, UserRatingService>();
 
             var app = builder.Build();
 
