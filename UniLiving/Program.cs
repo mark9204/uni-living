@@ -3,6 +3,8 @@ using UniLiving.DataContext;
 using UniLiving.Services.Services;
 using UniLiving.Services;
 using AutoMapper;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace UniLiving
 {
@@ -18,6 +20,27 @@ namespace UniLiving
             // Connection String
             builder.Services.AddDbContext<UniDBContext>(options => 
                 options.UseSqlServer(builder.Configuration.GetConnectionString("UniLivingContext")));
+
+            // Add JWT Authentication
+            builder.Configuration.GetSection("Jwt");
+            var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key)
+                    };
+                });
+            {
+                
 
             // AutoMapper Configuration
             builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ApplicationMappingProfile>());
