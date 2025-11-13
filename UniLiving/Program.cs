@@ -45,10 +45,12 @@ namespace UniLiving
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Register Services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPropertyService, PropertyService>();
             builder.Services.AddScoped<IUserRatingService, UserRatingService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             var app = builder.Build();
 

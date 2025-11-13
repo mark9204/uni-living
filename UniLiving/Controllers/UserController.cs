@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UniLiving.Services.Services;
 using UniLiving.DataContext.DTOs;
@@ -16,6 +17,7 @@ namespace UniLiving.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
             var users = await _userService.GetAllUsersAsync();
@@ -23,6 +25,7 @@ namespace UniLiving.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserDto>> Get(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -32,6 +35,7 @@ namespace UniLiving.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<UserDto>> Create([FromBody] UserDto userDto)
         {
             var created = await _userService.CreateUserAsync(userDto);
@@ -39,6 +43,7 @@ namespace UniLiving.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<UserDto>> Update(int id, [FromBody] UserDto userDto)
         {
             try
@@ -53,6 +58,7 @@ namespace UniLiving.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _userService.DeleteUserAsync(id);
