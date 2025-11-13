@@ -27,22 +27,22 @@ export default function LoginPage() {
 
     return (
         <Flex
-            flexDirection="column"
-            width="100wh"
-            height="100vh"
+            width="100vw"
+            minHeight="100vh"
             backgroundColor="gray.200"
             justifyContent="center"
             alignItems="center"
         >
             <Stack
-                flexDir="column"
-                mb="2"
-                justifyContent="center"
-                alignItems="center"
+                spacing={4}
+                align="center"
+                width="100%"
+                maxWidth="468px"
+                px={4}
             >
-                <Avatar bg="teal.500" />
-                <Heading color="teal.400">Welcome</Heading>
-                <Box minW={{ base: "90%", md: "468px" }}>
+                <Avatar bg="yellow.500" size="lg" />
+                <Heading color="black.600" textOutline="10px solid" textOutlineColor="black.600">Üdvözöljük</Heading>
+                <Box width="100%">
                     <form>
                         <Stack
                             spacing={4}
@@ -56,7 +56,7 @@ export default function LoginPage() {
                                         pointerEvents="none"
                                         children={<CFaUserAlt color="gray.300" />}
                                     />
-                                    <Input type="email" placeholder="email address" />
+                                    <Input type="email" placeholder="E-mail cím" />
                                 </InputGroup>
                             </FormControl>
                             <FormControl>
@@ -68,37 +68,43 @@ export default function LoginPage() {
                                     />
                                     <Input
                                         type={showPassword ? "text" : "password"}
-                                        placeholder="Password"
+                                        placeholder="Jelszó"
                                     />
-                                    <InputRightElement width="4.5rem">
-                                        <Button h="1.75rem" size="sm" onClick={handleShowClick}>
-                                            {showPassword ? "Hide" : "Show"}
+                                    <InputRightElement width="auto" pr={1}>
+                                        <Button h="2rem" size="sm" onClick={handleShowClick}>
+                                            {showPassword ? "Elrejtés" : "Megjelenítés"}
                                         </Button>
                                     </InputRightElement>
                                 </InputGroup>
                                 <FormHelperText textAlign="right">
-                                    <Link>forgot password?</Link>
+                                    <Link>Elfelejtetted a jelszavad?</Link>
                                 </FormHelperText>
                             </FormControl>
                             <Button
                                 borderRadius={0}
                                 type="submit"
                                 variant="solid"
-                                colorScheme="teal"
+                                colorScheme="yellow"
                                 width="full"
                             >
-                                Login
+                                Bejelentkezés
                             </Button>
                         </Stack>
                     </form>
                 </Box>
+                <Box textAlign="center" mt={6}>
+                    <Heading size="sm" mb={3}>
+                        Még nem vagy nálunk tag?
+                    </Heading>
+                    <Button
+                        colorScheme="yellow"
+                        variant="outline"
+                        width="full"
+                    >
+                        Regisztráció
+                    </Button>
+                </Box>
             </Stack>
-            <Box>
-                New to us?{" "}
-                <Link color="teal.500" href="#">
-                    Sign Up
-                </Link>
-            </Box>
         </Flex>
     );
 }
