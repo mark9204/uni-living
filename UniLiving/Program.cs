@@ -18,7 +18,7 @@ namespace UniLiving
             builder.Services.AddControllers();
 
             // Connection String
-            builder.Services.AddDbContext<UniDBContext>(options => 
+            builder.Services.AddDbContext<UniDBContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("UniLivingContext")));
 
             // Add JWT Authentication
@@ -40,34 +40,36 @@ namespace UniLiving
                     };
                 });
             {
-                
 
-            // AutoMapper Configuration
-            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ApplicationMappingProfile>());
 
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+                // AutoMapper Configuration
+                builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ApplicationMappingProfile>());
 
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IPropertyService, PropertyService>();
-            builder.Services.AddScoped<IUserRatingService, UserRatingService>();
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
+                builder.Services.AddScoped<IUserService, UserService>();
+                builder.Services.AddScoped<IPropertyService, PropertyService>();
+                builder.Services.AddScoped<IUserRatingService, UserRatingService>();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                var app = builder.Build();
+
+                // Configure the HTTP request pipeline.
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseSwagger();
+                    app.UseSwaggerUI();
+                }
+
+                app.UseHttpsRedirection();
+
+                app.UseAuthorization();
+
+                app.MapControllers();
+
+                app.Run();
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.Run();
         }
+
     }
 }
