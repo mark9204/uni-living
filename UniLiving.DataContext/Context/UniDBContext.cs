@@ -31,6 +31,7 @@ namespace UniLiving.DataContext
         public DbSet<SearchPreference> SearchPreferences { get; set; } = null!;
         public DbSet<SystemStat> SystemStats { get; set; } = null!;
         public DbSet<AdminAuditLog> AdminAuditLogs { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -204,6 +205,15 @@ namespace UniLiving.DataContext
                 .WithMany()
                 .HasForeignKey(aal => aal.AdminId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => new { rt.UserId, rt.ExpiresAt });
 
             // Seed default data
             modelBuilder.Entity<Role>().HasData(

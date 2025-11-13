@@ -36,5 +36,6 @@ namespace UniLiving.DataContext.Entities
         public virtual ICollection<ChatMessage> ChatMessages { get; set; } = new List<ChatMessage>();
         public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
         public virtual SearchPreference? SearchPreference { get; set; }
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

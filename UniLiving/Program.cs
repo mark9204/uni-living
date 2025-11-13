@@ -22,7 +22,6 @@ namespace UniLiving
                 options.UseSqlServer(builder.Configuration.GetConnectionString("UniLivingContext")));
 
             // Add JWT Authentication
-            builder.Configuration.GetSection("Jwt");
             var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -39,37 +38,35 @@ namespace UniLiving
                         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key)
                     };
                 });
+
+            // AutoMapper Configuration
+            builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ApplicationMappingProfile>());
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPropertyService, PropertyService>();
+            builder.Services.AddScoped<IUserRatingService, UserRatingService>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
             {
-
-
-                // AutoMapper Configuration
-                builder.Services.AddAutoMapper(cfg => cfg.AddProfile<ApplicationMappingProfile>());
-
-                builder.Services.AddEndpointsApiExplorer();
-                builder.Services.AddSwaggerGen();
-
-                builder.Services.AddScoped<IUserService, UserService>();
-                builder.Services.AddScoped<IPropertyService, PropertyService>();
-                builder.Services.AddScoped<IUserRatingService, UserRatingService>();
-
-                var app = builder.Build();
-
-                // Configure the HTTP request pipeline.
-                if (app.Environment.IsDevelopment())
-                {
-                    app.UseSwagger();
-                    app.UseSwaggerUI();
-                }
-
-                app.UseHttpsRedirection();
-
-                app.UseAuthorization();
-
-                app.MapControllers();
-
-                app.Run();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
-        }
 
+            app.UseHttpsRedirection();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
+        }
     }
 }
