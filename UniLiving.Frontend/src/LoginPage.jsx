@@ -16,6 +16,8 @@ import {
     InputRightElement
 } from "@chakra-ui/react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
+import { Link as RouterLink } from "react-router-dom";
+import Navbar from "./Navbar";
 
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
@@ -30,9 +32,14 @@ export default function LoginPage() {
             width="100vw"
             minHeight="100vh"
             backgroundColor="gray.200"
-            justifyContent="center"
-            alignItems="center"
+            flexDirection="column"
         >
+            <Navbar />
+            <Flex
+                flex={1}
+                justifyContent="center"
+                alignItems="center"
+            >
             <Stack
                 spacing={4}
                 align="center"
@@ -97,6 +104,8 @@ export default function LoginPage() {
                         Még nem vagy nálunk tag?
                     </Heading>
                     <Button
+                        as={RouterLink}
+                        to="/register"
                         colorScheme="yellow"
                         variant="outline"
                         width="full"
@@ -105,6 +114,7 @@ export default function LoginPage() {
                     </Button>
                 </Box>
             </Stack>
+            </Flex>
         </Flex>
     );
 }
