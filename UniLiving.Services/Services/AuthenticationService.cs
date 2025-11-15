@@ -50,6 +50,10 @@ namespace UniLiving.Services.Services
             if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
                 throw new ArgumentException("Email and password are required");
 
+            // Validate role selection (must be Landlord or Tenant/Renter)
+            if (request.RoleId != 2 && request.RoleId != 3)
+                throw new ArgumentException("Invalid role selection. Must be Landlord (2) or Tenant/Renter (3)");
+
             // Check if user already exists
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == request.Email);
@@ -66,7 +70,7 @@ namespace UniLiving.Services.Services
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 IsActive = true,
                 IsEmailVerified = false,
-                RoleId = 1, // Default role (adjust as needed)
+                RoleId = request.RoleId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

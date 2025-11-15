@@ -16,6 +16,18 @@ namespace UniLiving
 
             // Add services to the container.
             builder.Services.AddControllers();
+            
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReactApp", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5174") // React dev server
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials();
+                });
+            });
 
             // Connection String
             builder.Services.AddDbContext<UniDBContext>(options =>
@@ -62,6 +74,8 @@ namespace UniLiving
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowReactApp");
 
             app.UseAuthentication();
             app.UseAuthorization();

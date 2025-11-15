@@ -19,5 +19,9 @@ namespace UniLiving.DataContext.DTOs
         [Required]
         [MaxLength(100)]
         public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        [Range(2, 3, ErrorMessage = "Role must be either 2 (Landlord) or 3 (Tenant/Renter)")]
+        public int RoleId { get; set; }
     }
 }
