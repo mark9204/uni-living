@@ -27,7 +27,7 @@ function Navbar() {
       py={4}
       px={8}
     >
-      <Flex justify="space-between" align="center" maxW="100%">
+      <Flex justify="space-between" align="center" maxW="100%" gap={8}>
         {/* Logo */}
         <RouterLink to="/">
           <Text
@@ -40,23 +40,37 @@ function Navbar() {
           </Text>
         </RouterLink>
 
-        {/* Navigation Links */}
-        <HStack spacing={6}>
-          <Button 
-            as={RouterLink}
-            to="/properties"
-            variant="ghost" 
-            size="md"
-          >
-            Lakások
-          </Button>
-          <Button variant="ghost" size="md">
-            Profil
-          </Button>
-          <Button variant="ghost" size="md">
-            Rólunk
-          </Button>
-        </HStack>
+        {/* Center Section - Navigation Links with Upload Button for Landlords */}
+        <Flex flex="1" justify="center" align="center">
+          <HStack spacing={6}>
+            {user && (user.role === 'Landlord' || user.role === 'Owner') && (
+              <Button
+                as={RouterLink}
+                to="/upload"
+                colorScheme="yellow"
+                size="lg"
+                fontWeight="bold"
+                leftIcon={<Text fontSize="xl">+</Text>}
+              >
+                Feltöltés
+              </Button>
+            )}
+            <Button 
+              as={RouterLink}
+              to="/properties"
+              variant="ghost" 
+              size="md"
+            >
+              Lakások
+            </Button>
+            <Button variant="ghost" size="md">
+              Profil
+            </Button>
+            <Button variant="ghost" size="md">
+              Rólunk
+            </Button>
+          </HStack>
+        </Flex>
 
         {/* Right Side - Login & Theme Toggle */}
         <HStack spacing={4}>

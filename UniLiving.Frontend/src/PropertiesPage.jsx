@@ -4,8 +4,8 @@ import { Flex, Box, Heading, Text, Grid, GridItem } from '@chakra-ui/react';
 function PropertiesPage() {
   return (
     <Flex
-      width="100vw"
-      height="100vh"
+      width="100%"
+      height="100%"
       flexDirection="column"
       backgroundColor="gray.200"
       overflow="hidden"

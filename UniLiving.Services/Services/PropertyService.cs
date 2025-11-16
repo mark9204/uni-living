@@ -31,6 +31,13 @@ namespace UniLiving.Services.Services
 
         public async Task<PropertyDto> CreatePropertyAsync(PropertyDto propertyDto)
         {
+            // Validate category exists
+            var category = await _context.PropertyCategories
+                .FirstOrDefaultAsync(pc => pc.Id == propertyDto.CategoryId);
+
+            if (category == null)
+                throw new KeyNotFoundException($"Property category with ID {propertyDto.CategoryId} not found");
+
             var property = _mapper.Map<Property>(propertyDto);
             property.CreatedAt = DateTime.UtcNow;
             property.IsActive = true;
@@ -47,6 +54,16 @@ namespace UniLiving.Services.Services
             var property = await _context.Properties.FindAsync(id);
             if (property == null)
                 throw new KeyNotFoundException("Property not found");
+
+            // Validate category exists if it's being changed
+            if (property.CategoryId != propertyDto.CategoryId)
+            {
+                var category = await _context.PropertyCategories
+                    .FirstOrDefaultAsync(pc => pc.Id == propertyDto.CategoryId);
+
+                if (category == null)
+                    throw new KeyNotFoundException($"Property category with ID {propertyDto.CategoryId} not found");
+            }
 
             _mapper.Map(propertyDto, property);
             property.UpdatedAt = DateTime.UtcNow;

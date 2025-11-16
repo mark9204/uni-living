@@ -144,11 +144,14 @@ export default function RegisterPage() {
             password,
             confirmPassword,
             phoneNumber: `+${countryCode}${phone}`,
-            role: userType,
+            roleId: userType === 'landlord' ? 2 : 3, // 2 for Landlord, 3 for Tenant
         };
+
+        console.log('Sending registration data:', registrationData);
 
         try {
             const result = await apiClient.register(registrationData);
+            console.log('Registration result:', result);
             const token = result.accessToken || result.token;
             const refreshToken = result.refreshToken;
             login(token, refreshToken); // Use the login function from AuthContext
@@ -175,12 +178,13 @@ export default function RegisterPage() {
 
     return (
         <Flex
-            width="100vw"
-            minHeight="100vh"
+            width="100%"
+            height="100%"
             backgroundColor="gray.200"
             justifyContent="center"
             alignItems="center"
             py={6}
+            overflow="auto"
         >
             <Stack
                 spacing={4}

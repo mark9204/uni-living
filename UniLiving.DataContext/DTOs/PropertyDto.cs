@@ -6,6 +6,7 @@ namespace UniLiving.DataContext.DTOs
     public class PropertyDto
     {
         public int Id { get; set; }
+        public int CategoryId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string Address { get; set; } = string.Empty;

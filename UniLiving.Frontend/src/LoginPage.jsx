@@ -80,11 +80,12 @@ export default function LoginPage() {
 
     return (
         <Flex
-            width="100vw"
-            minHeight="100vh"
+            width="100%"
+            height="100%"
             backgroundColor="gray.200"
             justifyContent="center"
             alignItems="center"
+            overflow="auto"
         >
             <Stack
                 spacing={4}

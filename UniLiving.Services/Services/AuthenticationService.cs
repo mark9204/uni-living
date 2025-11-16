@@ -78,11 +78,16 @@ namespace UniLiving.Services.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            // Reload user with Role relationship
+            user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == user.Id);
+
             // Generate tokens
             var accessToken = GenerateAccessToken(user);
             var refreshToken = await _tokenService.GenerateTokenAsync(
                 user.Id,
-                TimeSpan.FromDays(7)); // Match your appsettings
+                TimeSpan.FromDays(7));
 
             return new AuthResponseDto
             {

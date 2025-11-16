@@ -1,11 +1,12 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, Flex, Box } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import PropertiesPage from './PropertiesPage';
+import UploadPropertyPage from './UploadPropertyPage';
 import { AuthProvider } from './AuthContext';
 import Navbar from './Navbar';
 
@@ -32,12 +33,14 @@ function AppRoutes() {
         animate="animate"
         exit="exit"
         transition={pageTransition}
+        style={{ width: '100%', height: '100%' }}
       >
         <Routes location={location}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/properties" element={<PropertiesPage />} />
+          <Route path="/upload" element={<UploadPropertyPage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
@@ -49,8 +52,12 @@ function App() {
     <ChakraProvider>
       <Router>
         <AuthProvider>
-          <Navbar />
-          <AppRoutes />
+          <Flex direction="column" height="100vh" overflow="hidden">
+            <Navbar />
+            <Box flex="1" overflow="hidden">
+              <AppRoutes />
+            </Box>
+          </Flex>
         </AuthProvider>
       </Router>
     </ChakraProvider>

@@ -46,10 +46,11 @@ class ApiClient {
         let error;
         try {
           error = await response.json();
+          console.error('Registration error from backend:', error);
         } catch {
           error = { message: `HTTP ${response.status}: ${response.statusText}` };
         }
-        throw new Error(error.message || 'Registration failed');
+        throw new Error(error.message || JSON.stringify(error) || 'Registration failed');
       }
 
       const result = await response.json();

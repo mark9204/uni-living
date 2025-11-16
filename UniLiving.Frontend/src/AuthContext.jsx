@@ -24,8 +24,14 @@ export const AuthProvider = ({ children }) => {
           || decoded.email 
           || 'User';
         
+        // Extract role
+        const userRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+          || decoded.role
+          || 'Tenant';
+        
         console.log('Extracted user name:', userName);
-        setUser({ name: userName });
+        console.log('Extracted user role:', userRole);
+        setUser({ name: userName, role: userRole });
         apiClient.setAuthToken(token);
       } catch (error) {
         console.error("Invalid token:", error);

@@ -223,10 +223,10 @@ namespace UniLiving.DataContext
             );
 
             modelBuilder.Entity<PropertyCategory>().HasData(
-                new PropertyCategory { Id = 1, Name = "Apartment", Description = "Traditional rental apartment", CreatedAt = _seedDate, UpdatedAt = _seedDate },
-                new PropertyCategory { Id = 2, Name = "Dormitory", Description = "Student dormitory", CreatedAt = _seedDate, UpdatedAt = _seedDate },
-                new PropertyCategory { Id = 3, Name = "SharedApartment", Description = "Shared apartment with roommates", CreatedAt = _seedDate, UpdatedAt = _seedDate },
-                new PropertyCategory { Id = 4, Name = "Room", Description = "Single room for rent", CreatedAt = _seedDate, UpdatedAt = _seedDate }
+                new PropertyCategory { Id = 1, Name = "Lakás", Description = "Lakás bérleti lehetőség", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new PropertyCategory { Id = 2, Name = "Ház", Description = "Egész ház bérleti lehetőség", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new PropertyCategory { Id = 3, Name = "Szoba", Description = "Szoba bérleti lehetőség", CreatedAt = _seedDate, UpdatedAt = _seedDate },
+                new PropertyCategory { Id = 4, Name = "Garzon", Description = "Garzon lakás bérleti lehetőség", CreatedAt = _seedDate, UpdatedAt = _seedDate }
             );
 
             modelBuilder.Entity<NotificationType>().HasData(
