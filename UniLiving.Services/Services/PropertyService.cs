@@ -104,6 +104,7 @@ namespace UniLiving.Services.Services
             var property = await _context.Properties
                 .Include(p => p.Category)
                 .Include(p => p.Owner)
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             return _mapper.Map<PropertyDto?>(property);
@@ -114,6 +115,7 @@ namespace UniLiving.Services.Services
             var properties = await _context.Properties
                 .Include(p => p.Category)
                 .Include(p => p.Owner)
+                .Include(p => p.Images)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);

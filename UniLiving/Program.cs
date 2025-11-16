@@ -80,7 +80,7 @@ namespace UniLiving
             app.UseHttpsRedirection();
 
             // Ensure uploads directory exists
-            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "uploads");
             Directory.CreateDirectory(uploadsPath);
 
             app.UseStaticFiles(new StaticFileOptions

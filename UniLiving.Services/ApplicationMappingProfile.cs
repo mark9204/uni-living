@@ -37,6 +37,9 @@ namespace UniLiving.Services
             // Property mapping
             CreateMap<Property, PropertyDto>()
                 .ForMember(dest => dest.OwnerName, opt => opt.MapFrom(src => src.Owner.FirstName + " " + src.Owner.LastName))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
+                .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner))
                 .ReverseMap();
 
             // PropertyImage mapping

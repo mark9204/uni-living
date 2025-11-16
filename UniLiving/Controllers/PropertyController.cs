@@ -146,7 +146,7 @@ namespace UniLiving.Controllers
             if (!result)
                 return BadRequest(new { error = "Failed to set main image" });
 
-            return Ok();
+            return Ok(new { success = true, message = "Main image set successfully" });
         }
     }
 }

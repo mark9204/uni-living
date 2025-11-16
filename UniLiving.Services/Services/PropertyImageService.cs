@@ -30,6 +30,11 @@ namespace UniLiving.Services.Services
             _mapper = mapper;
         }
 
+        private string ConstructFilePath(int propertyId, string fileName)
+        {
+            return $"properties/prop_{propertyId}/{fileName}";
+        }
+
         public async Task<PropertyImageDto> AddPropertyImageAsync(int propertyId, string filePath, string fileName, long fileSize, string mimeType, bool isMainImage = false)
         {
             // Verify property exists
@@ -65,7 +70,9 @@ namespace UniLiving.Services.Services
             _context.PropertyImages.Add(propertyImage);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<PropertyImageDto>(propertyImage);
+            var imageDto = _mapper.Map<PropertyImageDto>(propertyImage);
+            imageDto.FilePath = ConstructFilePath(propertyId, imageDto.FilePath);
+            return imageDto;
         }
 
         public async Task<bool> DeletePropertyImageAsync(int imageId)
@@ -88,13 +95,29 @@ namespace UniLiving.Services.Services
                 .ThenBy(pi => pi.DisplayOrder)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<PropertyImageDto>>(images);
+            var imageDtos = _mapper.Map<List<PropertyImageDto>>(images);
+            
+            // Set the full file path for serving
+            foreach (var image in imageDtos)
+            {
+                image.FilePath = ConstructFilePath(propertyId, image.FilePath);
+            }
+            
+            return imageDtos;
         }
 
         public async Task<PropertyImageDto?> GetPropertyImageByIdAsync(int imageId)
         {
             var image = await _context.PropertyImages.FindAsync(imageId);
-            return _mapper.Map<PropertyImageDto?>(image);
+            if (image == null)
+                return null;
+                
+            var imageDto = _mapper.Map<PropertyImageDto?>(image);
+            if (imageDto != null)
+            {
+             imageDto.FilePath = ConstructFilePath(image.PropertyId, imageDto.FilePath);
+            }
+            return imageDto;
         }
 
         public async Task<bool> SetMainImageAsync(int propertyId, int imageId)

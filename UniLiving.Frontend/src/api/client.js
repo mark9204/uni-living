@@ -222,6 +222,16 @@ class ApiClient {
     return response.json();
   }
 
+  async getPropertyImages(propertyId) {
+    const response = await fetch(`${API_BASE_URL}/api/property/${propertyId}/images`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch property images');
+    return response.json();
+  }
+
   async setMainPropertyImage(propertyId, imageId) {
     const response = await fetch(
       `${API_BASE_URL}/api/property/images/${imageId}/set-main?propertyId=${propertyId}`,
