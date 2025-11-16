@@ -25,10 +25,12 @@ import {
 import { CloseIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "./api/client";
+import { useAuth } from "./AuthContext";
 
 export default function UploadPropertyPage() {
     const toast = useToast();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
 
     // Képek kezelése
@@ -156,36 +158,96 @@ export default function UploadPropertyPage() {
             return;
         }
 
+        // Kép fájlméret ellenőrzés (max 10 MB / kép)
+        const maxSizeMB = 10;
+        const oversizedImages = images.filter(img => img.file.size > maxSizeMB * 1024 * 1024);
+        if (oversizedImages.length > 0) {
+            toast({
+                title: "Hiba",
+                description: `${oversizedImages.length} kép túllépi a ${maxSizeMB} MB limitet.`,
+                status: "error",
+                duration: 4000,
+                isClosable: true,
+            });
+            return;
+        }
+
         setIsLoading(true);
 
-        // Az adatok összeállítása a backend által várt formátumban
-        const propertyData = {
-            title,
-            description,
-            address,
-            city,
-            price: parseFloat(price), // Szám formátumra konvertáljuk
-            currency,
-            size: parseFloat(size),
-            roomCount: parseInt(roomCount),
-            categoryId: parseInt(categoryId),
-            hasBalcony,
-            hasParking,
-            hasElevator,
-            petsAllowed,
-            smokingAllowed,
-            // isActive és isApproved a backend állítja be, nem küldünk
-        };
-
-        console.log('Sending property data:', propertyData);
-
         try {
-            const result = await apiClient.createProperty(propertyData);
-            console.log('Property created:', result);
+            // LÉPÉS 1: Property létrehozása (képek nélkül)
+            const propertyData = {
+                title,
+                description,
+                address,
+                city,
+                price: parseFloat(price),
+                currency,
+                size: parseFloat(size),
+                roomCount: parseInt(roomCount),
+                categoryId: parseInt(categoryId),
+                hasBalcony,
+                hasParking,
+                hasElevator,
+                petsAllowed,
+                smokingAllowed,
+            };
+
+            console.log('LÉPÉS 1: Property létrehozása...', propertyData);
+            const propertyResult = await apiClient.createProperty(propertyData);
+            console.log('Property létrehozva, ID:', propertyResult.id);
+
+            // LÉPÉS 2: Képek feltöltése egyesével
+            console.log(`LÉPÉS 2: ${images.length} kép feltöltése...`);
+            const uploadedImages = [];
             
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                
+                toast({
+                    title: "Feltöltés folyamatban...",
+                    description: `Kép ${i + 1}/${images.length} feltöltése...`,
+                    status: "info",
+                    duration: 2000,
+                    isClosable: true,
+                });
+
+                try {
+                    const uploadedImage = await apiClient.uploadPropertyImage(
+                        propertyResult.id, 
+                        image.file
+                    );
+                    uploadedImages.push(uploadedImage);
+                    console.log(`Kép ${i + 1} feltöltve, ID:`, uploadedImage.id);
+                } catch (error) {
+                    console.error(`Kép ${i + 1} feltöltése sikertelen:`, error);
+                    toast({
+                        title: "Kép feltöltési hiba",
+                        description: `A ${i + 1}. kép feltöltése sikertelen: ${error.message}`,
+                        status: "warning",
+                        duration: 4000,
+                        isClosable: true,
+                    });
+                }
+            }
+
+            // LÉPÉS 3: Főkép beállítása (az első feltöltött kép, ami főképnek van jelölve)
+            if (uploadedImages.length > 0) {
+                const mainImageIndex = images.findIndex(img => img.isMain);
+                const mainImage = uploadedImages[mainImageIndex >= 0 ? mainImageIndex : 0];
+                
+                console.log('LÉPÉS 3: Főkép beállítása, ID:', mainImage.id);
+                try {
+                    await apiClient.setMainPropertyImage(propertyResult.id, mainImage.id);
+                    console.log('Főkép beállítva');
+                } catch (error) {
+                    console.error('Főkép beállítása sikertelen:', error);
+                }
+            }
+
             toast({
                 title: "Sikeres feltöltés!",
-                description: "Az ingatlan sikeresen fel lett töltve.",
+                description: `Az ingatlan sikeresen fel lett töltve ${uploadedImages.length} képpel.`,
                 status: "success",
                 duration: 4000,
                 isClosable: true,
@@ -194,9 +256,10 @@ export default function UploadPropertyPage() {
             // Átirányítás a lakások oldalra
             navigate("/properties");
         } catch (error) {
+            console.error('Property létrehozási hiba:', error);
             toast({
                 title: "Feltöltési hiba",
-                description: error.message || "Ismeretlen hiba történt.",
+                description: error.message || "Ismeretlen hiba történt a property létrehozása során.",
                 status: "error",
                 duration: 5000,
                 isClosable: true,

@@ -23,9 +23,9 @@ namespace UniLiving.DataContext.DTOs
         public bool IsActive { get; set; }
         public bool IsApproved { get; set; }
         public DateTime CreatedAt { get; set; }
-        public PropertyCategoryDto Category { get; set; } = null!;
+        public PropertyCategoryDto? Category { get; set; }
         public List<PropertyImageDto> Images { get; set; } = new();
-        public UserDto Owner { get; set; } = null!;
-        public required object OwnerName { get; set; }
+        public UserDto? Owner { get; set; }
+        public string? OwnerName { get; set; }
     }
 }

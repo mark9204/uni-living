@@ -5,6 +5,7 @@ using UniLiving.Services;
 using AutoMapper;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 
 namespace UniLiving
 {
@@ -60,9 +61,12 @@ namespace UniLiving
             // Register Services
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPropertyService, PropertyService>();
+            builder.Services.AddScoped<IPropertyImageService, PropertyImageService>();
+            builder.Services.AddScoped<IFileStorageService, FileStorageService>();
             builder.Services.AddScoped<IUserRatingService, UserRatingService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
@@ -74,6 +78,16 @@ namespace UniLiving
             }
 
             app.UseHttpsRedirection();
+
+            // Ensure uploads directory exists
+            var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+            Directory.CreateDirectory(uploadsPath);
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(uploadsPath),
+                RequestPath = "/uploads"
+            });
 
             app.UseCors("AllowReactApp");
 

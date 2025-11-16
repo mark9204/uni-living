@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using UniLiving.DataContext;
 using UniLiving.DataContext.DTOs;
@@ -11,7 +13,7 @@ namespace UniLiving.Services.Services
 {
     public interface IPropertyService
     {
-        Task<PropertyDto> CreatePropertyAsync(PropertyDto propertyDto);
+        Task<PropertyDto> CreatePropertyAsync(PropertyDto propertyDto, IHttpContextAccessor httpContextAccessor);
         Task<PropertyDto> UpdatePropertyAsync(int id, PropertyDto propertyDto);
         Task<bool> DeletePropertyAsync(int id);
         Task<PropertyDto?> GetPropertyByIdAsync(int id);
@@ -29,7 +31,7 @@ namespace UniLiving.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<PropertyDto> CreatePropertyAsync(PropertyDto propertyDto)
+        public async Task<PropertyDto> CreatePropertyAsync(PropertyDto propertyDto, IHttpContextAccessor httpContextAccessor)
         {
             // Validate category exists
             var category = await _context.PropertyCategories
@@ -38,8 +40,20 @@ namespace UniLiving.Services.Services
             if (category == null)
                 throw new KeyNotFoundException($"Property category with ID {propertyDto.CategoryId} not found");
 
+            // Get the current user ID from the JWT token
+            var userIdClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int ownerId))
+                throw new UnauthorizedAccessException("User ID not found in token");
+
+            // Verify the user exists
+            var user = await _context.Users.FindAsync(ownerId);
+            if (user == null)
+                throw new KeyNotFoundException($"User with ID {ownerId} not found");
+
             var property = _mapper.Map<Property>(propertyDto);
+            property.OwnerId = ownerId;
             property.CreatedAt = DateTime.UtcNow;
+            property.UpdatedAt = DateTime.UtcNow;
             property.IsActive = true;
             property.IsApproved = false;
 

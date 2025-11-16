@@ -1,12 +1,11 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7218';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7177';
 
 class ApiClient {
   constructor() {
-    this.token = localStorage.getItem('authToken');
+    // Token mindig frissen lesz beolvasva a getAuthToken()-ből
   }
 
   setAuthToken(token) {
-    this.token = token;
     if (token) {
       localStorage.setItem('authToken', token);
     } else {
@@ -15,7 +14,7 @@ class ApiClient {
   }
 
   getAuthToken() {
-    return this.token;
+    return localStorage.getItem('authToken');
   }
 
   getHeaders(includeAuth = true) {
@@ -163,7 +162,17 @@ class ApiClient {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) throw new Error('Failed to create property');
+    if (!response.ok) {
+      let error;
+      try {
+        error = await response.json();
+        console.error('Property creation error from backend:', error);
+      } catch {
+        error = { message: `HTTP ${response.status}: ${response.statusText}` };
+      }
+      throw new Error(error.message || JSON.stringify(error) || 'Failed to create property');
+    }
+    
     return response.json();
   }
 
@@ -185,6 +194,50 @@ class ApiClient {
     });
 
     if (!response.ok) throw new Error('Failed to delete property');
+  }
+
+  async uploadPropertyImage(propertyId, imageFile) {
+    const formData = new FormData();
+    formData.append('file', imageFile);
+
+    const response = await fetch(`${API_BASE_URL}/api/property/${propertyId}/images`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.getAuthToken()}`
+        // NE add hozzá a Content-Type-ot! A FormData automatikusan beállítja
+      },
+      body: formData
+    });
+
+    if (!response.ok) {
+      let error;
+      try {
+        error = await response.json();
+      } catch {
+        error = { message: `HTTP ${response.status}: ${response.statusText}` };
+      }
+      throw new Error(error.error || error.message || 'Image upload failed');
+    }
+    
+    return response.json();
+  }
+
+  async setMainPropertyImage(propertyId, imageId) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/property/images/${imageId}/set-main?propertyId=${propertyId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.getAuthToken()}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to set main image');
+    }
+    
+    return response.json();
   }
 }
 
