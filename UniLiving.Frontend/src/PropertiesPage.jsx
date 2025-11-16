@@ -11,6 +11,7 @@ import {
     Badge,
     Spinner,
     useToast,
+    useColorModeValue,
 } from '@chakra-ui/react';
 import { apiClient } from './api/client';
 
@@ -19,6 +20,11 @@ function PropertiesPage() {
     const toast = useToast();
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
+    const pageBg = useColorModeValue('gray.50', 'gray.800');
+    const cardBg = useColorModeValue('white', 'gray.700');
+    const headingColor = useColorModeValue('gray.800', 'white');
+    const textColor = useColorModeValue('gray.600', 'gray.400');
+    const noPropertyBg = useColorModeValue('white', 'gray.700');
 
     useEffect(() => {
         loadProperties();
@@ -58,11 +64,11 @@ function PropertiesPage() {
             width="100%"
             height="100%"
             flexDirection="column"
-            backgroundColor="gray.50"
+            backgroundColor={pageBg}
             overflow="hidden"
         >
             <Flex flex={1} width="100%" overflow="auto" flexDirection="column" p={8}>
-                <Heading as="h1" size="2xl" color="gray.800" mb={8}>
+                <Heading as="h1" size="2xl" color={headingColor} mb={8}>
                     Elérhető lakások
                 </Heading>
 
@@ -72,13 +78,13 @@ function PropertiesPage() {
                     </Flex>
                 ) : properties.length === 0 ? (
                     <Box
-                        bg="white"
+                        bg={noPropertyBg}
                         borderRadius="12px"
                         boxShadow="md"
                         p={8}
                         textAlign="center"
                     >
-                        <Text color="gray.500" fontSize="lg">
+                        <Text color={textColor} fontSize="lg">
                             Még nincsenek elérhető lakások
                         </Text>
                     </Box>
@@ -94,7 +100,7 @@ function PropertiesPage() {
                             return (
                                 <GridItem key={property.id}>
                                     <Box
-                                        bg="white"
+                                        bg={cardBg}
                                         borderRadius="xl"
                                         boxShadow="md"
                                         overflow="hidden"
@@ -131,7 +137,7 @@ function PropertiesPage() {
                                                 position="absolute"
                                                 top={3}
                                                 right={3}
-                                                colorScheme="blue"
+                                                colorScheme="yellow"
                                                 fontSize="md"
                                                 px={3}
                                                 py={1}
@@ -143,13 +149,13 @@ function PropertiesPage() {
 
                                         {/* Adatok */}
                                         <Box p={4}>
-                                            <Heading size="md" mb={2} noOfLines={1}>
-                                                {property.title}
+                                            <Heading size="md" mb={2} noOfLines={1} color={useColorModeValue('yellow.500', 'white')}>
+                                                {property.title}    
                                             </Heading>
-                                            <Text color="gray.600" fontSize="sm" mb={2} noOfLines={1}>
+                                            <Text color={textColor} fontSize="sm" mb={2} noOfLines={1}>
                                                 📍 {property.address}, {property.city}
                                             </Text>
-                                            <Flex gap={3} color="gray.600" fontSize="sm">
+                                            <Flex gap={3} color={textColor} fontSize="sm">
                                                 <Text>🛏️ {property.roomCount} szoba</Text>
                                                 <Text>📏 {property.size} m²</Text>
                                             </Flex>

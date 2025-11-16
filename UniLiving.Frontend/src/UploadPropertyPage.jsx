@@ -21,6 +21,7 @@ import {
     Text,
     IconButton,
     Grid,
+    useColorModeValue,
 } from "@chakra-ui/react";
 import { CloseIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +33,15 @@ export default function UploadPropertyPage() {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+
+    const pageBg = useColorModeValue("gray.200", "gray.800");
+    const formBg = useColorModeValue("white", "gray.700");
+    const headingColor = useColorModeValue("black.600", "white");
+    const dropzoneBg = useColorModeValue("white", "gray.600");
+    const dropzoneHoverBg = useColorModeValue("gray.50", "gray.500");
+    const dropzoneBorderColor = useColorModeValue("gray.300", "gray.500");
+    const dropzoneHoverBorderColor = useColorModeValue("yellow.400", "yellow.300");
+    const imagePreviewBorderColor = useColorModeValue("gray.200", "gray.600");
 
     // Képek kezelése
     const [images, setImages] = useState([]);
@@ -281,14 +291,14 @@ export default function UploadPropertyPage() {
         <Flex
             width="100%"
             height="100%"
-            backgroundColor="gray.200"
+            backgroundColor={pageBg}
             justifyContent="center"
             alignItems="center"
             py={6}
             overflow="auto"
         >
             <Box width="100%" maxWidth="1400px" px={4}>
-                <Heading color="black.600" textAlign="center" mb={6}>Új ingatlan feltöltése</Heading>
+                <Heading color={headingColor} textAlign="center" mb={6}>Új ingatlan feltöltése</Heading>
                 
                 <Grid templateColumns={["1fr", "1fr", "1fr 2fr"]} gap={6}>
                     {/* Bal oldal - Képfeltöltés */}
@@ -297,18 +307,18 @@ export default function UploadPropertyPage() {
                             {/* Drag & Drop terület */}
                             <Box
                                 border="2px dashed"
-                                borderColor={isDragging ? "yellow.500" : "gray.300"}
+                                borderColor={isDragging ? dropzoneHoverBorderColor : dropzoneBorderColor}
                                 borderRadius="md"
                                 p={8}
                                 textAlign="center"
-                                bg={isDragging ? "yellow.50" : "white"}
+                                bg={isDragging ? dropzoneHoverBg : dropzoneBg}
                                 cursor="pointer"
                                 transition="all 0.2s"
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
                                 onClick={() => document.getElementById('file-input').click()}
-                                _hover={{ borderColor: "yellow.400", bg: "gray.50" }}
+                                _hover={{ borderColor: dropzoneHoverBorderColor, bg: dropzoneHoverBg }}
                             >
                                 <Input
                                     id="file-input"
@@ -341,7 +351,7 @@ export default function UploadPropertyPage() {
                                                 borderRadius="md"
                                                 overflow="hidden"
                                                 border="2px solid"
-                                                borderColor={img.isMain ? "yellow.500" : "gray.200"}
+                                                borderColor={img.isMain ? "yellow.500" : imagePreviewBorderColor}
                                                 cursor="pointer"
                                                 onClick={() => setAsMainImage(index)}
                                                 _hover={{ borderColor: "yellow.400" }}
@@ -394,7 +404,7 @@ export default function UploadPropertyPage() {
 
                     {/* Jobb oldal - Űrlap */}
                     <Box
-                        backgroundColor="white"
+                        backgroundColor={formBg}
                         p={8}
                         boxShadow="md"
                         borderRadius="md"

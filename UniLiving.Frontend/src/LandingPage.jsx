@@ -1,5 +1,15 @@
 import React from 'react';
-import { Flex, Box, VStack, Heading, Text, Button, Stack, Image } from '@chakra-ui/react';
+import {
+  Flex,
+  Box,
+  VStack,
+  Heading,
+  Text,
+  Button,
+  Stack,
+  Image,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -19,6 +29,10 @@ const scrollStyle = `
 `;
 
 function LandingPage() {
+  const bg = useColorModeValue('gray.200', 'gray.800');
+  const textColor = useColorModeValue('yellow.500', 'white');
+  const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
+  const galleryBg = useColorModeValue('gray.300', 'gray.700');
   // Placeholder pictures
   const properties = [
     {
@@ -169,7 +183,7 @@ function LandingPage() {
     {
       id: 30,
       image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=500&fit=crop',
-      title: 'Végső Otthon'
+      title: 'Végső Otthon',
     },
   ];
 
@@ -178,7 +192,7 @@ function LandingPage() {
       width="100%"
       height="100%"
       flexDirection="column"
-      backgroundColor="gray.200"
+      backgroundColor={bg}
       overflow="hidden"
     >
       <Flex flex={1} width="100%" overflow="hidden">
@@ -204,19 +218,19 @@ function LandingPage() {
               height="auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, ease: "easeIn" }}
+              transition={{ duration: 0.8, ease: 'easeIn' }}
             />
-            <Heading as="h1" size="2xl" color="black.600">
+            <Heading as="h1" size="2xl" color={textColor}>
               Üdvözlünk a UniLiving-nél
             </Heading>
-            <Text fontSize="lg" color="gray.600">
+            <Text fontSize="lg" color={secondaryTextColor}>
               Találd meg, ahova tartozol
             </Text>
-            <Button 
+            <Button
               as={RouterLink}
               to="/properties"
-              colorScheme="yellow" 
-              size="lg" 
+              colorScheme="yellow"
+              size="lg"
               width={["100%", "auto"]}
             >
               Kezdjük
@@ -228,9 +242,9 @@ function LandingPage() {
         <Box
           as={RouterLink}
           to="/properties"
-          display={["none", "none", "flex"]}
+          display={['none', 'none', 'flex']}
           width="50%"
-          backgroundColor="gray.300"
+          backgroundColor={galleryBg}
           justifyContent="center"
           alignItems="center"
           overflow="hidden"
@@ -238,11 +252,11 @@ function LandingPage() {
           cursor="pointer"
           transition="all 0.3s ease"
           _hover={{
-            bg: "gray.300",
-            "& > div:first-of-type": {
+            bg: 'gray.400',
+            '& > div:first-of-type': {
               opacity: 0.8,
             },
-            "& > div:last-of-type": {
+            '& > div:last-of-type': {
               opacity: 1,
             }
           }}

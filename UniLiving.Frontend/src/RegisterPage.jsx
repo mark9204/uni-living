@@ -14,7 +14,8 @@ import {
     FormControl,
     FormHelperText,
     InputRightElement,
-    useToast
+    useToast,
+    useColorModeValue
 } from "@chakra-ui/react";
 import { FaUserAlt, FaLock, FaEnvelope, FaPhone } from "react-icons/fa";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -33,6 +34,9 @@ export default function RegisterPage() {
     const toast = useToast();
     const navigate = useNavigate();
     const { login } = useAuth();
+    const formBackground = useColorModeValue("whiteAlpha.900", "gray.700");
+    const pageBg = useColorModeValue("gray.200", "gray.800");
+    const headingColor = useColorModeValue("black.600", "white");
     
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -180,7 +184,7 @@ export default function RegisterPage() {
         <Flex
             width="100%"
             height="100%"
-            backgroundColor="gray.200"
+            backgroundColor={pageBg}
             justifyContent="center"
             alignItems="center"
             py={6}
@@ -194,18 +198,18 @@ export default function RegisterPage() {
                 px={4}
             >
                 <Avatar bg="yellow.500" size="lg" />
-                <Heading color="black.600">Regisztráció</Heading>
+                <Heading color={headingColor}>Regisztráció</Heading>
                 <Box width="100%">
                     {!userType ? (
                         // User Type Selection
                         <Stack
                             spacing={4}
                             p="1rem"
-                            backgroundColor="whiteAlpha.900"
+                            backgroundColor={formBackground}
                             boxShadow="md"
                             align="center"
                         >
-                            <Heading size="md" color="black.600">Miben segíthetünk?</Heading>
+                            <Heading size="md" color={headingColor}>Miben segíthetünk?</Heading>
                             <Button
                                 width="full"
                                 colorScheme="yellow"
@@ -231,7 +235,7 @@ export default function RegisterPage() {
                             <Stack
                                 spacing={4}
                                 p="1rem"
-                                backgroundColor="whiteAlpha.900"
+                                backgroundColor={formBackground}
                                 boxShadow="md"
                             >
                                 <Button
@@ -295,7 +299,7 @@ export default function RegisterPage() {
                                             <InputGroup>
                                                 <InputLeftElement
                                                     pointerEvents="none"
-                                                    children={<span style={{ fontSize: "14px", color: "black" }}>+</span>}
+                                                    children={<span style={{ fontSize: "14px" }}>+</span>}
                                                 />
                                                 <Input 
                                                     type="text" 

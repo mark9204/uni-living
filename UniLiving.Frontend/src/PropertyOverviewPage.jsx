@@ -16,6 +16,7 @@ import {
     useToast,
     Spinner,
     Icon,
+    useColorModeValue,
 } from '@chakra-ui/react';
 import { FaBed, FaRulerCombined, FaMapMarkerAlt, FaUser, FaCheckCircle, FaTimesCircle, FaBath, FaCalendarAlt } from 'react-icons/fa';
 import { apiClient } from './api/client';
@@ -27,6 +28,13 @@ const PropertyOverviewPage = () => {
     const [property, setProperty] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(null);
+
+    const pageBg = useColorModeValue('gray.50', 'gray.800');
+    const cardBg = useColorModeValue('white', 'gray.700');
+    const textColor = useColorModeValue('gray.700', 'gray.200');
+    const secondaryTextColor = useColorModeValue('gray.600', 'gray.400');
+    const thumbnailBorderColor = useColorModeValue('gray.200', 'gray.600');
+    const noImageBg = useColorModeValue('gray.200', 'gray.600');
 
     useEffect(() => {
         loadProperty();
@@ -81,7 +89,7 @@ const PropertyOverviewPage = () => {
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7177';
 
     return (
-        <Box minH="100vh" bg="gray.50" pt={8} pb={24} overflowY="auto" height="100%">
+        <Box minH="100vh" bg={pageBg} pt={8} pb={24} overflowY="auto" height="100%">
             <Container maxW="container.xl">
                 <Button mb={6} onClick={() => navigate(-1)} variant="ghost">
                     ← Vissza
@@ -93,7 +101,7 @@ const PropertyOverviewPage = () => {
                         <VStack spacing={4} align="stretch">
                             {/* Nagy kép */}
                             <Box
-                                bg="white"
+                                bg={cardBg}
                                 borderRadius="xl"
                                 overflow="hidden"
                                 boxShadow="lg"
@@ -112,7 +120,7 @@ const PropertyOverviewPage = () => {
                                     <Box
                                         width="100%"
                                         height="100%"
-                                        bg="gray.200"
+                                        bg={noImageBg}
                                         display="flex"
                                         alignItems="center"
                                         justifyContent="center"
@@ -146,7 +154,7 @@ const PropertyOverviewPage = () => {
                                             borderRadius="md"
                                             overflow="hidden"
                                             border={selectedImage?.id === img.id ? '3px solid' : '2px solid'}
-                                            borderColor={selectedImage?.id === img.id ? 'yellow.400' : 'gray.200'}
+                                            borderColor={selectedImage?.id === img.id ? 'yellow.400' : thumbnailBorderColor}
                                             transition="all 0.2s"
                                             _hover={{ borderColor: 'yellow.400' }}
                                             height="100px"
@@ -164,11 +172,11 @@ const PropertyOverviewPage = () => {
                             )}
 
                             {/* Leírás */}
-                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
+                            <Box bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
                                 <Heading size="md" mb={4}>
                                     Leírás
                                 </Heading>
-                                <Text color="gray.700" lineHeight="tall">
+                                <Text color={textColor} lineHeight="tall">
                                     {property.description}
                                 </Text>
                             </Box>
@@ -199,26 +207,26 @@ const PropertyOverviewPage = () => {
                     <GridItem>
                         <VStack spacing={6} align="stretch">
                             {/* Címke és ár */}
-                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
+                            <Box bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
                                 <Heading size="lg" mb={2}>
                                     {property.title}
                                 </Heading>
                                 <HStack spacing={2} mb={4}>
                                     <Icon as={FaMapMarkerAlt} color="gray.500" />
-                                    <Text color="gray.600">
+                                    <Text color={secondaryTextColor}>
                                         {property.postalCode} {property.city}, {property.address}
                                     </Text>
-                                </HStack>
+                                 </HStack>
                                 <Heading size="2xl" color="yellow.500">
                                     {property.price.toLocaleString()} {property.currency}
-                                    <Text as="span" size="md" color="gray.500" fontWeight="normal">
+                                    <Text as="span" size="md" color={secondaryTextColor} fontWeight="normal">
                                         /hó
                                     </Text>
                                 </Heading>
                             </Box>
 
                             {/* Alapadatok */}
-                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
+                            <Box bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
                                 <Heading size="md" mb={4}>
                                     Alapadatok
                                 </Heading>
@@ -261,7 +269,7 @@ const PropertyOverviewPage = () => {
                             </Box>
 
                             {/* Elérhetőség */}
-                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
+                            <Box bg={cardBg} p={6} borderRadius="xl" boxShadow="md">
                                 <Heading size="md" mb={4}>
                                     Elérhetőség
                                 </Heading>
@@ -284,7 +292,7 @@ const PropertyOverviewPage = () => {
                             </Box>
 
                             {/* Tulajdonságok */}
-                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md" paddingBottom={3} marginBottom={10}>
+                            <Box bg={cardBg} p={6} borderRadius="xl" boxShadow="md" paddingBottom={3} marginBottom={10}>
                                 <Heading size="md" mb={4}>
                                     Tulajdonságok
                                 </Heading>

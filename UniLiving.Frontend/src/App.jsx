@@ -51,18 +51,16 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ChakraProvider>
-      <Router>
-        <AuthProvider>
-          <Flex direction="column" height="100vh" overflow="hidden">
-            <Navbar />
-            <Box flex="1" overflow="hidden">
-              <AppRoutes />
-            </Box>
-          </Flex>
-        </AuthProvider>
-      </Router>
-    </ChakraProvider>
+    <Router>
+      <AuthProvider>
+        <Flex direction="column" height="100vh" overflow="hidden">
+          <Navbar />
+          <Box flex="1" overflow="hidden">
+            <AppRoutes />
+          </Box>
+        </Flex>
+      </AuthProvider>
+    </Router>
   );
 }
 

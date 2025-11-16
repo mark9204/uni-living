@@ -7,6 +7,7 @@ import {
   Text,
   IconButton,
   useColorMode,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { SunIcon, MoonIcon } from '@chakra-ui/icons';
@@ -15,6 +16,7 @@ import { useAuth } from './AuthContext';
 function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, logout } = useAuth();
+  const navBg = useColorModeValue('white', 'gray.800');
 
   return (
     <Box
@@ -22,7 +24,7 @@ function Navbar() {
       position="sticky"
       top={0}
       zIndex={10}
-      bg="white"
+      bg={navBg}
       boxShadow="md"
       py={4}
       px={8}

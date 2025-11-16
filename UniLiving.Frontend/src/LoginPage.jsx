@@ -14,7 +14,8 @@ import {
     FormControl,
     FormHelperText,
     InputRightElement,
-    useToast
+    useToast,
+    useColorModeValue
 } from "@chakra-ui/react";
 import { FaUserAlt, FaLock } from "react-icons/fa";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -34,6 +35,9 @@ export default function LoginPage() {
     const toast = useToast();
     const navigate = useNavigate();
     const { login } = useAuth();
+    const formBackground = useColorModeValue("whiteAlpha.900", "gray.700");
+    const pageBg = useColorModeValue("gray.200", "gray.800");
+    const headingColor = useColorModeValue("black.600", "white");
 
     const handleShowClick = () => setShowPassword(!showPassword);
 
@@ -82,7 +86,7 @@ export default function LoginPage() {
         <Flex
             width="100%"
             height="100%"
-            backgroundColor="gray.200"
+            backgroundColor={pageBg}
             justifyContent="center"
             alignItems="center"
             overflow="auto"
@@ -95,13 +99,13 @@ export default function LoginPage() {
                 px={4}
             >
                 <Avatar bg="yellow.500" size="lg" />
-                <Heading color="black.600" textOutline="10px solid" textOutlineColor="black.600">Üdvözöljük</Heading>
+                <Heading color={headingColor}>Üdvözöljük</Heading>
                 <Box width="100%">
                     <form onSubmit={handleSubmit}>
                         <Stack
                             spacing={4}
                             p="1rem"
-                            backgroundColor="whiteAlpha.900"
+                            backgroundColor={formBackground}
                             boxShadow="md"
                         >
                             <FormControl>
