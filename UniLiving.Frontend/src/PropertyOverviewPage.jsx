@@ -17,7 +17,7 @@ import {
     Spinner,
     Icon,
 } from '@chakra-ui/react';
-import { FaBed, FaRulerCombined, FaMapMarkerAlt, FaUser, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaBed, FaRulerCombined, FaMapMarkerAlt, FaUser, FaCheckCircle, FaTimesCircle, FaBath, FaCalendarAlt } from 'react-icons/fa';
 import { apiClient } from './api/client';
 
 const PropertyOverviewPage = () => {
@@ -62,7 +62,7 @@ const PropertyOverviewPage = () => {
     if (loading) {
         return (
             <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-                <Spinner size="xl" color="blue.500" />
+                <Spinner size="xl" color="yellow.500" />
             </Box>
         );
     }
@@ -81,7 +81,7 @@ const PropertyOverviewPage = () => {
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7177';
 
     return (
-        <Box minH="100vh" bg="gray.50" py={8} overflowY="auto" height="100%">
+        <Box minH="100vh" bg="gray.50" pt={8} pb={24} overflowY="auto" height="100%">
             <Container maxW="container.xl">
                 <Button mb={6} onClick={() => navigate(-1)} variant="ghost">
                     ← Vissza
@@ -125,7 +125,7 @@ const PropertyOverviewPage = () => {
                                         position="absolute"
                                         top={4}
                                         right={4}
-                                        colorScheme="blue"
+                                        colorScheme="yellow"
                                         fontSize="sm"
                                         px={3}
                                         py={1}
@@ -146,9 +146,9 @@ const PropertyOverviewPage = () => {
                                             borderRadius="md"
                                             overflow="hidden"
                                             border={selectedImage?.id === img.id ? '3px solid' : '2px solid'}
-                                            borderColor={selectedImage?.id === img.id ? 'blue.500' : 'gray.200'}
+                                            borderColor={selectedImage?.id === img.id ? 'yellow.400' : 'gray.200'}
                                             transition="all 0.2s"
-                                            _hover={{ borderColor: 'blue.400' }}
+                                            _hover={{ borderColor: 'yellow.400' }}
                                             height="100px"
                                         >
                                             <Image
@@ -162,6 +162,36 @@ const PropertyOverviewPage = () => {
                                     ))}
                                 </Grid>
                             )}
+
+                            {/* Leírás */}
+                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
+                                <Heading size="md" mb={4}>
+                                    Leírás
+                                </Heading>
+                                <Text color="gray.700" lineHeight="tall">
+                                    {property.description}
+                                </Text>
+                            </Box>
+
+                            {/* Kapcsolatfelvétel gomb */}
+                            <Button
+                                colorScheme="yellow"
+                                size="lg"
+                                marginTop={25}
+                                width="100%"
+                                alignSelf="center"
+                                onClick={() => {
+                                    toast({
+                                        title: 'Kapcsolatfelvétel',
+                                        description: 'Ez a funkció hamarosan elérhető lesz!',
+                                        status: 'info',
+                                        duration: 3000,
+                                    });
+                                }}
+                            >
+                                Kapcsolatfelvétel
+                            </Button>
+                            
                         </VStack>
                     </GridItem>
 
@@ -176,10 +206,10 @@ const PropertyOverviewPage = () => {
                                 <HStack spacing={2} mb={4}>
                                     <Icon as={FaMapMarkerAlt} color="gray.500" />
                                     <Text color="gray.600">
-                                        {property.address}, {property.city}
+                                        {property.postalCode} {property.city}, {property.address}
                                     </Text>
                                 </HStack>
-                                <Heading size="2xl" color="blue.600">
+                                <Heading size="2xl" color="yellow.500">
                                     {property.price.toLocaleString()} {property.currency}
                                     <Text as="span" size="md" color="gray.500" fontWeight="normal">
                                         /hó
@@ -195,24 +225,31 @@ const PropertyOverviewPage = () => {
                                 <VStack spacing={3} align="stretch">
                                     <HStack justify="space-between">
                                         <HStack>
-                                            <Icon as={FaRulerCombined} color="blue.500" />
+                                            <Icon as={FaRulerCombined} color="yellow.400" />
                                             <Text fontWeight="medium">Méret:</Text>
                                         </HStack>
                                         <Text>{property.size} m²</Text>
                                     </HStack>
                                     <HStack justify="space-between">
                                         <HStack>
-                                            <Icon as={FaBed} color="blue.500" />
+                                            <Icon as={FaBed} color="yellow.400" />
                                             <Text fontWeight="medium">Szobák:</Text>
                                         </HStack>
                                         <Text>{property.roomCount} szoba</Text>
                                     </HStack>
                                     <HStack justify="space-between">
                                         <HStack>
-                                            <Icon as={FaUser} color="blue.500" />
+                                            <Icon as={FaBath} color="yellow.400" />
+                                            <Text fontWeight="medium">Fürdőszobák:</Text>
+                                        </HStack>
+                                        <Text>{property.bathroomCount || 'N/A'}</Text>
+                                    </HStack>
+                                    <HStack justify="space-between">
+                                        <HStack>
+                                            <Icon as={FaUser} color="yellow.400" />
                                             <Text fontWeight="medium">Bérbeadó:</Text>
                                         </HStack>
-                                        <Text>{property.owner?.name || 'N/A'}</Text>
+                                        <Text>{property.ownerName || 'N/A'}</Text>
                                     </HStack>
                                     {property.category && (
                                         <HStack justify="space-between">
@@ -223,8 +260,31 @@ const PropertyOverviewPage = () => {
                                 </VStack>
                             </Box>
 
-                            {/* Tulajdonságok */}
+                            {/* Elérhetőség */}
                             <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
+                                <Heading size="md" mb={4}>
+                                    Elérhetőség
+                                </Heading>
+                                <VStack spacing={3} align="stretch">
+                                    <HStack justify="space-between">
+                                        <HStack>
+                                            <Icon as={FaCalendarAlt} color="green.500" />
+                                            <Text fontWeight="medium">Elérhető ettől:</Text>
+                                        </HStack>
+                                        <Text>{property.availableFrom ? new Date(property.availableFrom).toLocaleDateString() : 'N/A'}</Text>
+                                    </HStack>
+                                    <HStack justify="space-between">
+                                        <HStack>
+                                            <Icon as={FaCalendarAlt} color="red.500" />
+                                            <Text fontWeight="medium">Elérhető eddig:</Text>
+                                        </HStack>
+                                        <Text>{property.availableTo ? new Date(property.availableTo).toLocaleDateString() : 'Határozatlan'}</Text>
+                                    </HStack>
+                                </VStack>
+                            </Box>
+
+                            {/* Tulajdonságok */}
+                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md" paddingBottom={3} marginBottom={10}>
                                 <Heading size="md" mb={4}>
                                     Tulajdonságok
                                 </Heading>
@@ -267,32 +327,8 @@ const PropertyOverviewPage = () => {
                                 </VStack>
                             </Box>
 
-                            {/* Leírás */}
-                            <Box bg="white" p={6} borderRadius="xl" boxShadow="md">
-                                <Heading size="md" mb={4}>
-                                    Leírás
-                                </Heading>
-                                <Text color="gray.700" lineHeight="tall">
-                                    {property.description}
-                                </Text>
-                            </Box>
+                            
 
-                            {/* Kapcsolatfelvétel gomb */}
-                            <Button
-                                colorScheme="blue"
-                                size="lg"
-                                width="100%"
-                                onClick={() => {
-                                    toast({
-                                        title: 'Kapcsolatfelvétel',
-                                        description: 'Ez a funkció hamarosan elérhető lesz!',
-                                        status: 'info',
-                                        duration: 3000,
-                                    });
-                                }}
-                            >
-                                Kapcsolatfelvétel
-                            </Button>
                         </VStack>
                     </GridItem>
                 </Grid>

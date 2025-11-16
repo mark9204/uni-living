@@ -20,32 +20,28 @@ namespace UniLiving.DataContext.Entities
         public string? Description { get; set; }
 
         [Required, MaxLength(500)]
-        public string Address { get; set; } = string.Empty;
+        public string Address { get; set; } = null!;
         [Required, MaxLength(100)]
-        public string City { get; set; } = string.Empty;
+        public string City { get; set; } = null!;
         [MaxLength(20)]
         public string? PostalCode { get; set; }
         [Required, MaxLength(100)]
         public string Country { get; set; } = "Hungary";
-        [Column(TypeName = "decimal(10,8)")]
-        public decimal? Latitude { get; set; }
-        [Column(TypeName = "decimal(11,8)")]
-        public decimal? Longitude { get; set; }
         [Required, Column(TypeName = "decimal(10,2)")]
         public decimal Price { get; set; }
         [Required, MaxLength(10)]
         public string Currency { get; set; } = "HUF";
         [Column(TypeName = "decimal(8,2)")]
         public decimal? Size { get; set; }
-        public int? RoomCount { get; set; }
+        public int RoomCount { get; set; }
         public int? BathroomCount { get; set; }
+        public DateTime? AvailableFrom { get; set; }
+        public DateTime? AvailableTo { get; set; }
         public bool HasBalcony { get; set; }
         public bool HasParking { get; set; }
         public bool HasElevator { get; set; }
         public bool PetsAllowed { get; set; }
         public bool SmokingAllowed { get; set; }
-        public DateTime? AvailableFrom { get; set; }
-        public DateTime? AvailableTo { get; set; }
         public bool IsActive { get; set; }
         public bool IsApproved { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -43,10 +43,14 @@ export default function UploadPropertyPage() {
     const [description, setDescription] = useState("");
     const [address, setAddress] = useState("");
     const [city, setCity] = useState("");
+    const [postalCode, setPostalCode] = useState("");
     const [price, setPrice] = useState("");
     const [currency, setCurrency] = useState("HUF");
     const [size, setSize] = useState("");
     const [roomCount, setRoomCount] = useState("");
+    const [bathroomCount, setBathroomCount] = useState("");
+    const [availableFrom, setAvailableFrom] = useState("");
+    const [availableTo, setAvailableTo] = useState("");
     
     // Kategória - később API-ból töltjük be, most hardcode-oljuk
     const [categoryId, setCategoryId] = useState("");
@@ -136,7 +140,7 @@ export default function UploadPropertyPage() {
         e.preventDefault();
 
         // Validáció - ellenőrizzük, hogy minden kötelező mező ki van-e töltve
-        if (!title || !description || !address || !city || !price || !size || !roomCount || !categoryId) {
+        if (!title || !description || !address || !city || !postalCode || !price || !size || !roomCount || !bathroomCount || !categoryId || !availableFrom) {
             toast({
                 title: "Hiba",
                 description: "Kérjük, töltse ki az összes kötelező mezőt.",
@@ -181,10 +185,14 @@ export default function UploadPropertyPage() {
                 description,
                 address,
                 city,
+                postalCode,
                 price: parseFloat(price),
                 currency,
                 size: parseFloat(size),
                 roomCount: parseInt(roomCount),
+                bathroomCount: parseInt(bathroomCount),
+                availableFrom,
+                availableTo: availableTo || null, // Ha üres, null-t küldünk
                 categoryId: parseInt(categoryId),
                 hasBalcony,
                 hasParking,
@@ -415,7 +423,7 @@ export default function UploadPropertyPage() {
                             </FormControl>
 
                             {/* Cím és Város - két oszlopban */}
-                            <SimpleGrid columns={[1, 2]} spacing={4}>
+                            <SimpleGrid columns={[1, 3]} spacing={4}>
                                 <FormControl isRequired>
                                     <FormLabel>Utca, házszám</FormLabel>
                                     <Input
@@ -431,6 +439,14 @@ export default function UploadPropertyPage() {
                                         placeholder="pl. Budapest"
                                         value={city}
                                         onChange={(e) => setCity(e.target.value)}
+                                    />
+                                </FormControl>
+                                <FormControl isRequired>
+                                    <FormLabel>Irányítószám</FormLabel>
+                                    <Input
+                                        placeholder="pl. 1054"
+                                        value={postalCode}
+                                        onChange={(e) => setPostalCode(e.target.value)}
                                     />
                                 </FormControl>
                             </SimpleGrid>
@@ -470,7 +486,7 @@ export default function UploadPropertyPage() {
                             </SimpleGrid>
 
                             {/* Szobaszám és Kategória */}
-                            <SimpleGrid columns={[1, 2]} spacing={4}>
+                            <SimpleGrid columns={[1, 3]} spacing={4}>
                                 <FormControl isRequired>
                                     <FormLabel>Szobák száma</FormLabel>
                                     <NumberInput min={1}>
@@ -478,6 +494,17 @@ export default function UploadPropertyPage() {
                                             placeholder="2"
                                             value={roomCount}
                                             onChange={(e) => setRoomCount(e.target.value)}
+                                        />
+                                    </NumberInput>
+                                </FormControl>
+
+                                <FormControl isRequired>
+                                    <FormLabel>Fürdőszobák száma</FormLabel>
+                                    <NumberInput min={1}>
+                                        <NumberInputField
+                                            placeholder="1"
+                                            value={bathroomCount}
+                                            onChange={(e) => setBathroomCount(e.target.value)}
                                         />
                                     </NumberInput>
                                 </FormControl>
@@ -494,6 +521,27 @@ export default function UploadPropertyPage() {
                                         <option value="3">Szoba</option>
                                         <option value="4">Garzon</option>
                                     </Select>
+                                </FormControl>
+                            </SimpleGrid>
+
+                             {/* Elérhetőség */}
+                             <SimpleGrid columns={[1, 2]} spacing={4}>
+                                <FormControl isRequired>
+                                    <FormLabel>Elérhető ettől</FormLabel>
+                                    <Input
+                                        type="date"
+                                        value={availableFrom}
+                                        onChange={(e) => setAvailableFrom(e.target.value)}
+                                    />
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel>Elérhető eddig (nem kötelező)</FormLabel>
+                                    <Input
+                                        type="date"
+                                        value={availableTo}
+                                        onChange={(e) => setAvailableTo(e.target.value)}
+                                        min={availableFrom} // Ne lehessen korábbi, mint a kezdő dátum
+                                    />
                                 </FormControl>
                             </SimpleGrid>
 
