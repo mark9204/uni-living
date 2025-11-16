@@ -53,6 +53,7 @@ function Navbar() {
                 size="lg"
                 fontWeight="bold"
                 leftIcon={<Text fontSize="xl">+</Text>}
+                _hover={yellow}
               >
                 Feltöltés
               </Button>
@@ -62,13 +63,25 @@ function Navbar() {
               to="/properties"
               variant="ghost" 
               size="md"
+              _hover={{ 
+                bg: useColorModeValue('yellow.300', 'yellow.500'),
+                color: useColorModeValue('yellow.900', 'white'),
+              }}
             >
               Lakások
             </Button>
-            <Button variant="ghost" size="md">
+            <Button variant="ghost" size="md"
+              _hover={{
+                bg: useColorModeValue('yellow.300', 'yellow.500'),
+                color: useColorModeValue('yellow.900', 'white'),
+              }}>
               Profil
             </Button>
-            <Button variant="ghost" size="md">
+            <Button variant="ghost" size="md"
+              _hover={{
+                bg: useColorModeValue('yellow.300', 'yellow.500'),
+                color: useColorModeValue('yellow.900', 'white'),
+              }}>
               Rólunk
             </Button>
           </HStack>
