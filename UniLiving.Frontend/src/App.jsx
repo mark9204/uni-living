@@ -6,6 +6,8 @@ import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import PropertiesPage from './PropertiesPage';
+import { AuthProvider } from './AuthContext';
+import Navbar from './Navbar';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -46,7 +48,10 @@ function App() {
   return (
     <ChakraProvider>
       <Router>
-        <AppRoutes />
+        <AuthProvider>
+          <Navbar />
+          <AppRoutes />
+        </AuthProvider>
       </Router>
     </ChakraProvider>
   );

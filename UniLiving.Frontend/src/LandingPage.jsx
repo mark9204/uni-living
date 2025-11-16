@@ -2,7 +2,6 @@ import React from 'react';
 import { Flex, Box, VStack, Heading, Text, Button, Stack, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Link as RouterLink } from 'react-router-dom';
-import Navbar from './Navbar';
 
 const MotionBox = motion(Box);
 const MotionImage = motion(Image);
@@ -182,7 +181,6 @@ function LandingPage() {
       backgroundColor="gray.200"
       overflow="hidden"
     >
-      <Navbar />
       <Flex flex={1} width="100%" overflow="hidden">
         {/* Left Side Content */}
         <Flex

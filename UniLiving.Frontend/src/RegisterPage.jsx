@@ -18,8 +18,8 @@ import {
 } from "@chakra-ui/react";
 import { FaUserAlt, FaLock, FaEnvelope, FaPhone } from "react-icons/fa";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import Navbar from "./Navbar";
 import { apiClient } from "./api/client";
+import { useAuth } from "./AuthContext";
 
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
@@ -32,6 +32,7 @@ console.log("API URL:", import.meta.env.VITE_API_URL || 'http://localhost:5000')
 export default function RegisterPage() {
     const toast = useToast();
     const navigate = useNavigate();
+    const { login } = useAuth();
     
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -104,7 +105,7 @@ export default function RegisterPage() {
         if (password !== confirmPassword) {
             toast({
                 title: "Hiba",
-                description: "A jelszavak nem egyeznek meg.",
+                description: "A jelszavak nem egyeznek.",
                 status: "error",
                 duration: 4000,
                 isClosable: true,
@@ -123,43 +124,48 @@ export default function RegisterPage() {
             return;
         }
 
-        // Role ID meghatározása
-        const roleId = userType === "renter" ? 3 : 2;
+        if (!userType) {
+            toast({
+                title: "Hiba",
+                description: "Kérjük, válassza ki, hogy bérlőként vagy bérbeadóként regisztrál.",
+                status: "error",
+                duration: 4000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        setIsLoading(true);
+
+        const registrationData = {
+            firstName,
+            lastName,
+            email,
+            password,
+            confirmPassword,
+            phoneNumber: `+${countryCode}${phone}`,
+            role: userType,
+        };
 
         try {
-            setIsLoading(true);
-            console.log("Regisztrációs adat küldése:", {
-                email,
-                password,
-                firstName,
-                lastName,
-                roleId,
-            });
-            await apiClient.register({
-                email,
-                password,
-                firstName,
-                lastName,
-                roleId,
-            });
-
+            const result = await apiClient.register(registrationData);
+            const token = result.accessToken || result.token;
+            const refreshToken = result.refreshToken;
+            login(token, refreshToken); // Use the login function from AuthContext
             toast({
-                title: "Sikeres regisztráció",
-                description: "Üdvözöljük a UniLiving-nél!",
+                title: "Sikeres regisztráció!",
+                description: "Most már be vagy jelentkezve.",
                 status: "success",
                 duration: 4000,
                 isClosable: true,
             });
-
-            // Átirányítás a bejelentkezés után
-            navigate("/");
+            navigate("/"); // Redirect to homepage
         } catch (error) {
-            console.error("Regisztrációs hiba:", error);
             toast({
                 title: "Regisztrációs hiba",
-                description: error.message || "Valamilyen hiba történt a regisztráció során.",
+                description: error.message || "Ismeretlen hiba történt.",
                 status: "error",
-                duration: 4000,
+                duration: 5000,
                 isClosable: true,
             });
         } finally {
@@ -172,15 +178,10 @@ export default function RegisterPage() {
             width="100vw"
             minHeight="100vh"
             backgroundColor="gray.200"
-            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            py={6}
         >
-            <Navbar />
-            <Flex
-                flex={1}
-                justifyContent="center"
-                alignItems="center"
-                py={6}
-            >
             <Stack
                 spacing={4}
                 align="center"
@@ -401,7 +402,6 @@ export default function RegisterPage() {
                     </Button>
                 </Box>
             </Stack>
-            </Flex>
         </Flex>
     );
 }

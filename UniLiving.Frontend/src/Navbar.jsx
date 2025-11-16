@@ -10,9 +10,11 @@ import {
 } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { SunIcon, MoonIcon } from '@chakra-ui/icons';
+import { useAuth } from './AuthContext';
 
 function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
+  const { user, logout } = useAuth();
 
   return (
     <Box
@@ -58,15 +60,24 @@ function Navbar() {
 
         {/* Right Side - Login & Theme Toggle */}
         <HStack spacing={4}>
-          <Button 
-            as={RouterLink}
-            to="/login"
-            colorScheme="yellow" 
-            variant="outline" 
-            size="md"
-          >
-            Belépés
-          </Button>
+          {user ? (
+            <>
+              <Text fontWeight="bold">Szia, {user.name}!</Text>
+              <Button onClick={logout} colorScheme="yellow" variant="outline" size="md">
+                Kijelentkezés
+              </Button>
+            </>
+          ) : (
+            <Button 
+              as={RouterLink}
+              to="/login"
+              colorScheme="yellow" 
+              variant="outline" 
+              size="md"
+            >
+              Belépés
+            </Button>
+          )}
           <IconButton
             icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
             onClick={toggleColorMode}

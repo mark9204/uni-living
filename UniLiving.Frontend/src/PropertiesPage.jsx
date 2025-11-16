@@ -1,6 +1,5 @@
 import React from 'react';
 import { Flex, Box, Heading, Text, Grid, GridItem } from '@chakra-ui/react';
-import Navbar from './Navbar';
 
 function PropertiesPage() {
   return (
@@ -11,7 +10,6 @@ function PropertiesPage() {
       backgroundColor="gray.200"
       overflow="hidden"
     >
-      <Navbar />
       <Flex flex={1} width="100%" overflow="auto" flexDirection="column" p={8}>
         <Heading as="h1" size="2xl" color="black.600" mb={8}>
           Lakások

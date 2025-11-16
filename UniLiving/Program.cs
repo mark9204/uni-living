@@ -22,7 +22,7 @@ namespace UniLiving
             {
                 options.AddPolicy("AllowReactApp", policy =>
                 {
-                    policy.WithOrigins("http://localhost:5174") // React dev server
+                    policy.WithOrigins("http://localhost:5173", "http://localhost:5174") // React dev servers
                           .AllowAnyMethod()
                           .AllowAnyHeader()
                           .AllowCredentials();

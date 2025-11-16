@@ -1,8 +1,21 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7218';
 
 class ApiClient {
+  constructor() {
+    this.token = localStorage.getItem('authToken');
+  }
+
+  setAuthToken(token) {
+    this.token = token;
+    if (token) {
+      localStorage.setItem('authToken', token);
+    } else {
+      localStorage.removeItem('authToken');
+    }
+  }
+
   getAuthToken() {
-    return localStorage.getItem('authToken');
+    return this.token;
   }
 
   getHeaders(includeAuth = true) {
@@ -40,8 +53,7 @@ class ApiClient {
       }
 
       const result = await response.json();
-      localStorage.setItem('authToken', result.token);
-      localStorage.setItem('refreshToken', result.refreshToken);
+      // No longer setting token here, will be handled by AuthContext
       return result;
     } catch (error) {
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
@@ -71,8 +83,7 @@ class ApiClient {
       }
 
       const result = await response.json();
-      localStorage.setItem('authToken', result.token);
-      localStorage.setItem('refreshToken', result.refreshToken);
+      // No longer setting token here, will be handled by AuthContext
       return result;
     } catch (error) {
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
@@ -93,13 +104,9 @@ class ApiClient {
         credentials: 'include',
       });
 
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refreshToken');
+      // No longer removing tokens here, will be handled by AuthContext
     } catch (error) {
       console.error('Logout error:', error);
-      // Még hiba esetén is törölünk
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refreshToken');
     }
   }
 
@@ -115,18 +122,15 @@ class ApiClient {
       });
 
       if (!response.ok) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
+        // Handled by AuthContext
         throw new Error('Token refresh failed');
       }
 
       const result = await response.json();
-      localStorage.setItem('authToken', result.token);
-      localStorage.setItem('refreshToken', result.refreshToken);
+      // No longer setting token here, will be handled by AuthContext
       return result;
     } catch (error) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('refreshToken');
+      // Handled by AuthContext
       throw error;
     }
   }
