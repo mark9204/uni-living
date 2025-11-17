@@ -331,7 +331,7 @@ export default function UploadPropertyPage() {
                                 <VStack spacing={2}>
                                     <Text fontSize="3xl">📷</Text>
                                     <Text fontWeight="bold">Képek feltöltése</Text>
-                                    <Text fontSize="sm" color="gray.600">
+                                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
                                         Kattints vagy húzd ide a képeket
                                     </Text>
                                 </VStack>
@@ -394,7 +394,7 @@ export default function UploadPropertyPage() {
                                             </Box>
                                         ))}
                                     </VStack>
-                                    <Text fontSize="xs" color="gray.600" mt={2}>
+                                    <Text fontSize="xs" color={useColorModeValue("gray.600", "gray.400")} mt={2}>
                                         Kattints egy képre, hogy főképpé tedd
                                     </Text>
                                 </Box>

@@ -53,7 +53,6 @@ function Navbar() {
                 size="lg"
                 fontWeight="bold"
                 leftIcon={<Text fontSize="xl">+</Text>}
-                _hover={yellow}
               >
                 Feltöltés
               </Button>
