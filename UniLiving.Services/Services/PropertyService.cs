@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,6 +19,7 @@ namespace UniLiving.Services.Services
         Task<bool> DeletePropertyAsync(int id);
         Task<PropertyDto?> GetPropertyByIdAsync(int id);
         Task<IEnumerable<PropertyDto>> GetAllPropertiesAsync();
+        Task<PagedResult<ListingDto>> GetPropertiesAsync(PropertyFilterDto filter);
     }
 
     public class PropertyService : IPropertyService
@@ -120,5 +122,122 @@ namespace UniLiving.Services.Services
 
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
         }
+        public async Task<PagedResult<ListingDto>> GetPropertiesAsync(PropertyFilterDto filter)
+        {
+            var query = _context.Properties.AsQueryable();
+
+            // Szűrés (Filtering)
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                var searchTermLower = filter.SearchTerm.ToLower();
+                query = query.Where(p =>
+                    p.Title.ToLower().Contains(searchTermLower) ||
+                    (p.Description != null && p.Description.ToLower().Contains(searchTermLower)));
+            }
+
+            if (filter.CategoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == filter.CategoryId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.City))
+            {
+                query = query.Where(p => p.City.ToLower() == filter.City.ToLower());
+            }
+
+            if (filter.MinPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= filter.MinPrice.Value);
+            }
+
+            if (filter.MaxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= filter.MaxPrice.Value);
+            }
+
+            if (filter.MinSize.HasValue)
+            {
+                query = query.Where(p => p.Size >= (decimal)filter.MinSize.Value);
+            }
+
+            if (filter.MaxSize.HasValue)
+            {
+                query = query.Where(p => p.Size <= (decimal)filter.MaxSize.Value);
+            }
+
+            if (filter.MinRoomCount.HasValue)
+            {
+                query = query.Where(p => p.RoomCount >= filter.MinRoomCount.Value);
+            }
+
+            if (filter.MaxRoomCount.HasValue)
+            {
+                query = query.Where(p => p.RoomCount <= filter.MaxRoomCount.Value);
+            }
+
+            if (filter.HasBalcony.HasValue)
+            {
+                query = query.Where(p => p.HasBalcony == filter.HasBalcony.Value);
+            }
+
+            if (filter.HasParking.HasValue)
+            {
+                query = query.Where(p => p.HasParking == filter.HasParking.Value);
+            }
+
+            if (filter.HasElevator.HasValue)
+            {
+                query = query.Where(p => p.HasElevator == filter.HasElevator.Value);
+            }
+
+            if (filter.PetsAllowed.HasValue)
+            {
+                query = query.Where(p => p.PetsAllowed == filter.PetsAllowed.Value);
+            }
+
+            if (filter.SmokingAllowed.HasValue)
+            {
+                query = query.Where(p => p.SmokingAllowed == filter.SmokingAllowed.Value);
+            }
+
+
+            // Rendezés (Sorting)
+            // Alapértelmezett rendezés, ha nincs megadva
+            if (string.IsNullOrWhiteSpace(filter.SortBy))
+            {
+                query = query.OrderByDescending(p => p.CreatedAt);
+            }
+            else
+            {
+                // Egyszerűsített rendezés, ezt lehet bővíteni
+                var isDescending = filter.SortDirection.Equals("desc", StringComparison.OrdinalIgnoreCase);
+                query = filter.SortBy.ToLower() switch
+                {
+                    "price" => isDescending ? query.OrderByDescending(p => p.Price) : query.OrderBy(p => p.Price),
+                    "date" => isDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt),
+                    _ => query.OrderByDescending(p => p.CreatedAt)
+                };
+            }
+
+            // Teljes találatok száma (lapozás előtt kell)
+            var totalCount = await query.CountAsync();
+
+            // Lapozás (Pagination)
+            query = query.Skip((filter.PageNumber - 1) * filter.PageSize).Take(filter.PageSize);
+
+            // Leképezés DTO-ra
+            var items = await query
+                .ProjectTo<ListingDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return new PagedResult<ListingDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageSize = filter.PageSize,
+                CurrentPage = filter.PageNumber
+            };
+        }
+
     }
 }

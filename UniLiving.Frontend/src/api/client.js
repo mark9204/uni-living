@@ -145,6 +145,33 @@ class ApiClient {
     return response.json();
   }
 
+  async getPropertiesPaged(filter) {
+    const params = new URLSearchParams();
+
+    if (filter) {
+      if (filter.city) params.append('city', filter.city);
+      if (filter.minPrice) params.append('minPrice', filter.minPrice);
+      if (filter.maxPrice) params.append('maxPrice', filter.maxPrice);
+      if (filter.hasBalcony !== undefined && filter.hasBalcony !== null) params.append('hasBalcony', filter.hasBalcony);
+      if (filter.hasElevator !== undefined && filter.hasElevator !== null) params.append('hasElevator', filter.hasElevator);
+      if (filter.sortBy) params.append('sortBy', filter.sortBy);
+      if (filter.sortDirection) params.append('sortDirection', filter.sortDirection);
+      if (filter.pageNumber) params.append('pageNumber', filter.pageNumber);
+      if (filter.pageSize) params.append('pageSize', filter.pageSize);
+    }
+
+    const queryString = params.toString();
+    const url = `${API_BASE_URL}/api/property/paged${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch properties');
+    return response.json();
+  }
+
   async getProperty(id) {
     const response = await fetch(`${API_BASE_URL}/api/property/${id}`, {
       method: 'GET',

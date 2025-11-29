@@ -26,6 +26,13 @@ namespace UniLiving.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedResult<ListingDto>>> GetProperties([FromQuery] PropertyFilterDto filter)
+        {
+            var properties = await _propertyService.GetPropertiesAsync(filter);
+            return Ok(properties);
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PropertyDto>>> GetAll()
         {
@@ -86,7 +93,7 @@ namespace UniLiving.Controllers
                         stream,
                         file.FileName,
                         propertyId);
-                    
+
                     // Save to database
                     var image = await _propertyImageService.AddPropertyImageAsync(
                         propertyId,

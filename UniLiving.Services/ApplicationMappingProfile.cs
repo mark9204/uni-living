@@ -41,6 +41,9 @@ namespace UniLiving.Services
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category))
                 .ForMember(dest => dest.Owner, opt => opt.MapFrom(src => src.Owner))
                 .ReverseMap();
+            CreateMap<Property, ListingDto>()
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.FirstOrDefault() != null ? src.Images.FirstOrDefault().FilePath : null))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
 
             // PropertyImage mapping
             CreateMap<PropertyImage, PropertyImageDto>()
