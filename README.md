@@ -51,77 +51,10 @@ uni-living/
 - **Library**: React 18+
 - **Build Tool**: Vite
 - **Routing**: React Router
-- **Styling**: CSS3 with modern design principles
 
 ### Database
 - **DBMS**: MySQL
 - **Migrations**: EF Core Migrations
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
-- [Node.js 18+](https://nodejs.org/)
-- [MySQL Server](https://dev.mysql.com/downloads/mysql/)
-
-### Backend Setup
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/mark9204/uni-living.git
-   cd uni-living
-   ```
-
-2. Navigate to the API project:
-   ```bash
-   cd UniLiving
-   ```
-
-3. Update the connection string in `appsettings.json`:
-   ```json
-   {
-     "ConnectionStrings": {
-       "DefaultConnection": "Server=localhost;Database=uniliving;User=root;Password=yourpassword;"
-     }
-   }
-   ```
-
-4. Apply database migrations:
-   ```bash
-   dotnet ef database update --project ../UniLiving.DataContext
-   ```
-
-5. Run the API:
-   ```bash
-   dotnet run
-   ```
-
-   The API will be available at `https://localhost:5001`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd UniLiving.Frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Update the API URL in `.env`:
-   ```
-   VITE_API_URL=https://localhost:5001
-   ```
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-   The frontend will be available at `http://localhost:5173`
 
 ## 📚 API Endpoints
 
@@ -151,46 +84,9 @@ uni-living/
 **Program**: Software Engineering BSc  
 **Project Type**: Diploma Thesis
 
-## 🔧 Development
-
-### Running Migrations
-
-Create a new migration:
-```bash
-cd UniLiving.DataContext
-dotnet ef migrations add MigrationName --startup-project ../UniLiving
-```
-
-Apply migrations:
-```bash
-dotnet ef database update --startup-project ../UniLiving
-```
-
-### Building for Production
-
-**Backend**:
-```bash
-cd UniLiving
-dotnet publish -c Release -o ./publish
-```
-
-**Frontend**:
-```bash
-cd UniLiving.Frontend
-npm run build
-```
-
 ## 📝 Project Status
 
 This project is currently under active development. Features and functionality are being continuously added and improved.
-
-### Planned Features
-- [ ] Advanced search and filtering
-- [ ] Messaging system between users
-- [ ] Payment integration
-- [ ] Email notifications
-- [ ] Admin dashboard
-- [ ] Property booking system
 
 ## 🤝 Contributing
 
