@@ -161,7 +161,6 @@ export default function UploadPropertyPage() {
             return;
         }
 
-        /* 
         if (images.length === 0) {
             toast({
                 title: "Hiba",
@@ -172,7 +171,6 @@ export default function UploadPropertyPage() {
             });
             return;
         }
-        */
 
         // Kép fájlméret ellenőrzés (max 10 MB / kép)
         const maxSizeMB = 10;
@@ -295,7 +293,7 @@ export default function UploadPropertyPage() {
             height="100%"
             backgroundColor={pageBg}
             justifyContent="center"
-            alignItems="center"
+            alignItems="flex-start"
             py={6}
             overflow="auto"
         >

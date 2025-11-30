@@ -147,9 +147,10 @@ function PropertiesPage() {
                 </Flex>
 
                 {/* Filters */}
-                <Collapse in={isOpen} animateOpacity>
-                    <Box mb={8} p={6} bg={cardBg} borderRadius="xl" boxShadow="sm">
-                        <Grid templateColumns={['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)', 'repeat(4, 1fr)']} gap={6}>
+                <Box position="relative" zIndex={10}>
+                    <Collapse in={isOpen} animateOpacity>
+                        <Box mb={8} p={6} bg={cardBg} borderRadius="xl" boxShadow="sm">
+                            <Grid templateColumns={['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)', 'repeat(4, 1fr)']} gap={6}>
                         <FormControl>
                             <FormLabel>Város</FormLabel>
                             <Input 
@@ -222,6 +223,7 @@ function PropertiesPage() {
                     </Grid>
                 </Box>
                 </Collapse>
+                </Box>
 
                 {loading ? (
                     <Flex justify="center" align="center" height="400px">
