@@ -18,7 +18,7 @@ import {
     Icon,
     useColorModeValue,
 } from '@chakra-ui/react';
-import { FaBed, FaRulerCombined, FaMapMarkerAlt, FaUser, FaCheckCircle, FaTimesCircle, FaBath, FaCalendarAlt } from 'react-icons/fa';
+import { FaBed, FaRulerCombined, FaMapMarkerAlt, FaUser, FaCheckCircle, FaTimesCircle, FaBath, FaCalendarAlt, FaEnvelope, FaPhone } from 'react-icons/fa';
 import { apiClient } from './api/client';
 
 const PropertyOverviewPage = () => {
@@ -258,6 +258,20 @@ const PropertyOverviewPage = () => {
                                             <Text fontWeight="medium">Bérbeadó:</Text>
                                         </HStack>
                                         <Text>{property.ownerName || 'N/A'}</Text>
+                                    </HStack>
+                                    <HStack justify="space-between">
+                                        <HStack>
+                                            <Icon as={FaEnvelope} color="yellow.400" />
+                                            <Text fontWeight="medium">Email:</Text>
+                                        </HStack>
+                                        <Text>{property.owner?.email || 'N/A'}</Text>
+                                    </HStack>
+                                    <HStack justify="space-between">
+                                        <HStack>
+                                            <Icon as={FaPhone} color="yellow.400" />
+                                            <Text fontWeight="medium">Telefon:</Text>
+                                        </HStack>
+                                        <Text>+36 30 564 4237</Text>
                                     </HStack>
                                     {property.category && (
                                         <HStack justify="space-between">
