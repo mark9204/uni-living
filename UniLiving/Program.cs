@@ -6,6 +6,7 @@ using AutoMapper;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.FileProviders;
+using UniLiving.Hubs;
 
 namespace UniLiving
 {
@@ -17,6 +18,7 @@ namespace UniLiving
 
             // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.AddSignalR();
             
             // Add CORS
             builder.Services.AddCors(options =>
@@ -50,6 +52,21 @@ namespace UniLiving
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(key)
                     };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/chat"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
 
             // AutoMapper Configuration
@@ -66,6 +83,7 @@ namespace UniLiving
             builder.Services.AddScoped<IUserRatingService, UserRatingService>();
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
             builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
@@ -95,6 +113,7 @@ namespace UniLiving
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<ChatHub>("/hubs/chat");
 
             app.Run();
         }
