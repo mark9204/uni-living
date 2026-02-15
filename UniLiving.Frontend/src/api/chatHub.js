@@ -2,6 +2,10 @@ import * as signalR from '@microsoft/signalr';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7177';
 
+console.log('🔧 Chat Hub API_BASE_URL:', API_BASE_URL);
+
+console.log('🔧 Chat Hub API_BASE_URL:', API_BASE_URL);
+
 /**
  * Creates and manages a SignalR connection to the chat hub.
  */

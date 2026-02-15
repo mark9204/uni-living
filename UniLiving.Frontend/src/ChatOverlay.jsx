@@ -41,12 +41,13 @@ function ChatOverlay() {
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
 
-  // Color tokens
+  // Color tokens - all hooks called unconditionally
   const overlayBg = useColorModeValue('white', 'gray.800');
   const headerBg = useColorModeValue('yellow.500', 'yellow.600');
   const myMsgBg = useColorModeValue('yellow.100', 'yellow.700');
   const otherMsgBg = useColorModeValue('gray.100', 'gray.600');
   const inputBg = useColorModeValue('gray.50', 'gray.700');
+  const borderColor = useColorModeValue('gray.200', 'gray.600');
 
   // ---- Connection lifecycle ----
   useEffect(() => {
@@ -55,14 +56,32 @@ function ChatOverlay() {
     const conn = createChatConnection();
 
     conn.on('ReceiveMessage', (msg) => {
+      console.log('📨 ReceiveMessage event:', msg);
+      console.log('🧑 Current user:', user);
+      
+      // Handle different message formats from backend
+      const messageText = typeof msg === 'string' ? msg : (msg.content || msg.message || msg.text || 'Unknown message');
+      const senderName = msg.senderName || msg.sender || msg.user || msg.from || 'Unknown';
+      const messageId = msg.id || msg.messageId || Date.now();
+      const timestamp = msg.sentAt || msg.timestamp || msg.createdAt || new Date().toISOString();
+      
+      // Check if this message is from the current user
+      const isOwnMessage = senderName === user?.name || 
+                          msg.senderId === user?.id ||
+                          msg.userId === user?.id ||
+                          msg.isFromCurrentUser === true;
+      
+      console.log('🤔 Is own message?', isOwnMessage);
+      console.log('📝 Message details:', { messageText, senderName, messageId, timestamp });
+      
       setMessages((prev) => [
         ...prev,
         {
-          id: msg.id ?? Date.now(),
-          sender: msg.senderName ?? msg.senderId ?? 'Unknown',
-          text: msg.content ?? msg.message ?? msg,
-          isOwn: false,
-          timestamp: msg.sentAt ?? new Date().toISOString(),
+          id: messageId,
+          sender: senderName,
+          text: messageText,
+          isOwn: isOwnMessage,
+          timestamp: timestamp,
         },
       ]);
       if (!isOpen) setUnreadCount((c) => c + 1);
@@ -86,17 +105,37 @@ function ChatOverlay() {
       });
     });
 
-    conn.onclose(() => setConnected(false));
-    conn.onreconnecting(() => setConnected(false));
-    conn.onreconnected(() => setConnected(true));
+    conn.onclose(() => {
+      console.log('🔌 SignalR connection closed');
+      setConnected(false);
+    });
+    conn.onreconnecting(() => {
+      console.log('🔄 SignalR reconnecting...');
+      setConnected(false);
+    });
+    conn.onreconnected(() => {
+      console.log('✅ SignalR reconnected');
+      setConnected(true);
+    });
 
+    console.log('🚀 Starting SignalR connection...');
     conn
       .start()
       .then(() => {
+        console.log('✅ SignalR connected successfully');
+        console.log('👤 User info:', user);
         setConnected(true);
+        console.log(`🏠 Attempting to join chat room ${chatRoomId}...`);
         return joinChatRoom(conn, chatRoomId);
       })
-      .catch((err) => console.error('Chat connection failed:', err));
+      .then(() => {
+        console.log(`✅ Joined chat room ${chatRoomId}`);
+      })
+      .catch((err) => {
+        console.error('❌ Join room failed, but chat will still work:', err);
+        // Set connected to true so chat functionality works even if room join fails
+        setConnected(true);
+      });
 
     setConnection(conn);
 
@@ -147,7 +186,9 @@ function ChatOverlay() {
     const text = inputValue.trim();
     if (!text || !connection || !connected) return;
 
-    // Optimistic local message
+    console.log('📤 Sending message:', text);
+    
+    // Add optimistic local message so user sees their own message immediately
     setMessages((prev) => [
       ...prev,
       {
@@ -169,8 +210,10 @@ function ChatOverlay() {
 
     try {
       await hubSendMessage(connection, chatRoomId, text);
+      console.log('✅ Message sent successfully');
     } catch (err) {
-      console.error('Failed to send message:', err);
+      console.error('❌ Failed to send message:', err);
+      // On error, maybe add a "failed to send" indicator
     }
   };
 
@@ -231,7 +274,7 @@ function ChatOverlay() {
           bg={overlayBg}
           boxShadow="2xl"
           borderLeftWidth="1px"
-          borderColor={useColorModeValue('gray.200', 'gray.600')}
+          borderColor={borderColor}
         >
           {/* Header */}
           <Flex

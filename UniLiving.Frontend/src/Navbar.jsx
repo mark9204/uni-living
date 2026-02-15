@@ -17,6 +17,8 @@ function Navbar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const { user, logout } = useAuth();
   const navBg = useColorModeValue('white', 'gray.800');
+  const yellowHover = useColorModeValue('yellow.300', 'yellow.500');
+  const yellowHoverText = useColorModeValue('yellow.900', 'white');
 
   return (
     <Box
@@ -63,8 +65,8 @@ function Navbar() {
               variant="ghost" 
               size="md"
               _hover={{ 
-                bg: useColorModeValue('yellow.300', 'yellow.500'),
-                color: useColorModeValue('yellow.900', 'white'),
+                bg: yellowHover,
+                color: yellowHoverText,
               }}
             >
               Lakások
@@ -75,8 +77,8 @@ function Navbar() {
                 size="md"
                 onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
                 _hover={{
-                  bg: useColorModeValue('yellow.300', 'yellow.500'),
-                  color: useColorModeValue('yellow.900', 'white'),
+                  bg: yellowHover,
+                  color: yellowHoverText,
                 }}
               >
                 Chat
@@ -84,15 +86,15 @@ function Navbar() {
             )}
             <Button variant="ghost" size="md"
               _hover={{
-                bg: useColorModeValue('yellow.300', 'yellow.500'),
-                color: useColorModeValue('yellow.900', 'white'),
+                bg: yellowHover,
+                color: yellowHoverText,
               }}>
               Profil
             </Button>
             <Button variant="ghost" size="md"
               _hover={{
-                bg: useColorModeValue('yellow.300', 'yellow.500'),
-                color: useColorModeValue('yellow.900', 'white'),
+                bg: yellowHover,
+                color: yellowHoverText,
               }}>
               Rólunk
             </Button>
