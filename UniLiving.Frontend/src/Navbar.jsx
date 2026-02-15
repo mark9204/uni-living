@@ -69,6 +69,19 @@ function Navbar() {
             >
               Lakások
             </Button>
+            {user && (
+              <Button
+                variant="ghost"
+                size="md"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
+                _hover={{
+                  bg: useColorModeValue('yellow.300', 'yellow.500'),
+                  color: useColorModeValue('yellow.900', 'white'),
+                }}
+              >
+                Chat
+              </Button>
+            )}
             <Button variant="ghost" size="md"
               _hover={{
                 bg: useColorModeValue('yellow.300', 'yellow.500'),
