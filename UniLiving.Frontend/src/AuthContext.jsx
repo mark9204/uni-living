@@ -15,6 +15,10 @@ export const AuthProvider = ({ children }) => {
         const decoded = jwtDecode(token);
         console.log('Decoded JWT token:', decoded);
         
+        const userId = decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+          || decoded.nameid
+          || decoded.sub;
+
         // Try different possible claim names for the user's name
         const userName = decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname']
           || decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] 
@@ -31,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         
         console.log('Extracted user name:', userName);
         console.log('Extracted user role:', userRole);
-        setUser({ name: userName, role: userRole });
+        setUser({ id: userId ? Number(userId) : null, name: userName, role: userRole });
         apiClient.setAuthToken(token);
       } catch (error) {
         console.error("Invalid token:", error);

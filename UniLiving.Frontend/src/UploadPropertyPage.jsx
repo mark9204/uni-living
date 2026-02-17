@@ -42,6 +42,7 @@ export default function UploadPropertyPage() {
     const dropzoneBorderColor = useColorModeValue("gray.300", "gray.500");
     const dropzoneHoverBorderColor = useColorModeValue("yellow.400", "yellow.300");
     const imagePreviewBorderColor = useColorModeValue("gray.200", "gray.600");
+    const textMutedColor = useColorModeValue("gray.600", "gray.400");
 
     // Képek kezelése
     const [images, setImages] = useState([]);
@@ -331,7 +332,7 @@ export default function UploadPropertyPage() {
                                 <VStack spacing={2}>
                                     <Text fontSize="3xl">📷</Text>
                                     <Text fontWeight="bold">Képek feltöltése</Text>
-                                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")}>
+                                    <Text fontSize="sm" color={textMutedColor}>
                                         Kattints vagy húzd ide a képeket
                                     </Text>
                                 </VStack>
@@ -394,7 +395,7 @@ export default function UploadPropertyPage() {
                                             </Box>
                                         ))}
                                     </VStack>
-                                    <Text fontSize="xs" color={useColorModeValue("gray.600", "gray.400")} mt={2}>
+                                    <Text fontSize="xs" color={textMutedColor} mt={2}>
                                         Kattints egy képre, hogy főképpé tedd
                                     </Text>
                                 </Box>

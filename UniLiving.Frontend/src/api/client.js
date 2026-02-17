@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7177';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5200';
 
 class ApiClient {
   constructor() {
@@ -275,6 +275,97 @@ class ApiClient {
     }
     
     return response.json();
+  }
+
+  // Chat Room API methods
+  async createOrGetChatRoom(propertyId) {
+    console.log('🔧 Creating/getting chat room for property:', propertyId);
+    
+    // Use the correct endpoint: POST /api/Chat/rooms/{propertyId}
+    const response = await fetch(`${API_BASE_URL}/api/Chat/rooms/${propertyId}`, {
+      method: 'POST',
+      headers: this.getHeaders(true)
+      // No body needed - backend gets user info from JWT
+    });
+
+    console.log('🔧 Chat room API response:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('🔧 Chat room API error:', errorText);
+      throw new Error(`Failed to create chat room: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+    
+    const roomData = await response.json();
+    console.log('🔧 Chat room created/retrieved:', roomData);
+    return roomData;
+  }
+
+  async getUserChatRooms() {
+    console.log('🔧 Getting user chat rooms...');
+    const response = await fetch(`${API_BASE_URL}/api/Chat/rooms`, {
+      method: 'GET',
+      headers: this.getHeaders(true)
+    });
+
+    console.log('🔧 User chat rooms API response:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('🔧 User chat rooms API error:', errorText);
+      throw new Error(`Failed to get user chat rooms: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+    
+    const roomsData = await response.json();
+    console.log('🔧 User chat rooms retrieved:', roomsData);
+    return roomsData;
+  }
+
+  async getChatRoom(roomId) {
+    const response = await fetch(`${API_BASE_URL}/api/Chat/rooms/${roomId}`, {
+      method: 'GET',
+      headers: this.getHeaders(true)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get chat room');
+    }
+    
+    return response.json();
+  }
+
+  async getChatMessages(roomId, take = 50) {
+    const response = await fetch(`${API_BASE_URL}/api/Chat/rooms/${roomId}/messages?take=${take}`, {
+      method: 'GET',
+      headers: this.getHeaders(true)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get messages');
+    }
+    
+    return response.json();
+  }
+
+  async sendChatMessage(roomId, message) {
+    console.log('🔧 Sending chat message to room:', roomId, 'message:', message);
+    const response = await fetch(`${API_BASE_URL}/api/Chat/rooms/${roomId}/messages`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ content: message })
+    });
+
+    console.log('🔧 Send message API response:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('🔧 Send message API error:', errorText);
+      throw new Error(`Failed to send message: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+    
+    const messageData = await response.json();
+    console.log('🔧 Message sent:', messageData);
+    return messageData;
   }
 }
 

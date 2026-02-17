@@ -13,8 +13,12 @@ export function createChatConnection() {
   const token = localStorage.getItem('authToken');
 
   const connection = new signalR.HubConnectionBuilder()
-    .withUrl(`${API_BASE_URL}/hubs/chat`, {
-      accessTokenFactory: () => localStorage.getItem('authToken'),
+    .withUrl(`${API_BASE_URL}/hubs/chat?access_token=${encodeURIComponent(token ?? '')}`, {
+      accessTokenFactory: () => {
+        const authToken = localStorage.getItem('authToken');
+        console.log('🔑 SignalR using token:', authToken ? 'Token present' : 'No token');
+        return authToken ?? '';
+      }
     })
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Information)
