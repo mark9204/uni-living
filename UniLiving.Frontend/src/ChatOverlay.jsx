@@ -80,17 +80,34 @@ function ChatOverlay() {
       console.log('🤔 Is own message?', isOwnMessage);
       console.log('📝 Message details:', { messageText, senderName, messageId, timestamp });
       
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: messageId,
-          sender: senderName,
-          text: messageText,
-          isOwn: isOwnMessage,
-          timestamp: timestamp,
-        },
-      ]);
-      if (!isOpen) setUnreadCount((c) => c + 1);
+      // Check for duplicate messages to prevent double messaging
+      setMessages((prev) => {
+        // Check if message already exists
+        const messageExists = prev.some(existingMsg => 
+          existingMsg.id === messageId ||
+          (existingMsg.text === messageText && 
+           existingMsg.isOwn === isOwnMessage && 
+           Math.abs(new Date(existingMsg.timestamp).getTime() - new Date(timestamp).getTime()) < 5000)
+        );
+        
+        if (messageExists) {
+          console.log('🚫 Duplicate message detected, skipping:', messageId);
+          return prev;
+        }
+        
+        return [
+          ...prev,
+          {
+            id: messageId,
+            sender: isOwnMessage ? 'Én' : senderName,
+            text: messageText,
+            isOwn: isOwnMessage,
+            timestamp: timestamp,
+          },
+        ];
+      });
+      
+      if (!isOpen && !isOwnMessage) setUnreadCount((c) => c + 1);
     });
 
     conn.on('MessageRead', (messageId) => {
@@ -205,13 +222,16 @@ function ChatOverlay() {
       const existingMessages = await apiClient.getChatMessages(roomId, 50);
       console.log('📱 Loaded existing messages:', existingMessages);
       
-      const formattedMessages = existingMessages.map(msg => ({
-        id: msg.id,
-        sender: msg.senderName || msg.sender || 'Unknown',
-        text: msg.content || msg.message || msg.text || '',
-        isOwn: msg.senderId === user?.id || msg.senderName === user?.name,
-        timestamp: msg.sentAt || msg.timestamp || msg.createdAt
-      }));
+      const formattedMessages = existingMessages.map(msg => {
+        const isOwnMessage = msg.senderId === user?.id || msg.senderName === user?.name;
+        return {
+          id: msg.id,
+          sender: isOwnMessage ? 'Én' : (msg.senderName || msg.sender || 'Unknown'),
+          text: msg.content || msg.message || msg.text || '',
+          isOwn: isOwnMessage,
+          timestamp: msg.sentAt || msg.timestamp || msg.createdAt
+        };
+      });
       
       setMessages(formattedMessages);
     } catch (error) {
@@ -274,17 +294,6 @@ function ChatOverlay() {
 
     console.log('📤 Sending message:', text);
 
-    // Add optimistic local message so user sees their own message immediately
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        sender: user?.name ?? 'Me',
-        text,
-        isOwn: true,
-        timestamp: new Date().toISOString(),
-      },
-    ]);
     setInputValue('');
 
     // Stop typing indicator
@@ -309,8 +318,23 @@ function ChatOverlay() {
       try {
         await apiClient.sendChatMessage(chatRoomId, text);
         console.log('✅ Message sent via REST');
+        
+        // Only add optimistic message if REST fallback is used
+        // (SignalR will trigger ReceiveMessage event)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            sender: 'Én',
+            text,
+            isOwn: true,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
       } catch (err) {
         console.error('❌ REST send failed:', err);
+        // Re-add the text to input if sending failed completely
+        setInputValue(text);
       }
     }
   };

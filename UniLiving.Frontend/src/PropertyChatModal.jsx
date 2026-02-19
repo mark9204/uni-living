@@ -38,8 +38,9 @@ const PropertyChatModal = ({ isOpen, onClose, property, existingChatRoom }) => {
   const [inputValue, setInputValue] = useState('');
   const [chatRoom, setChatRoom] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   const messagesEndRef = useRef(null);
+  const connectionRef = useRef(null);
 
   // Color tokens
   const modalBg = useColorModeValue('white', 'gray.800');
@@ -64,11 +65,12 @@ const PropertyChatModal = ({ isOpen, onClose, property, existingChatRoom }) => {
       initializeChatRoom();
     }
     return () => {
-      if (connection) {
-        connection.stop();
-        setConnection(null);
-        setConnected(false);
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+        connectionRef.current = null;
       }
+      setConnection(null);
+      setConnected(false);
       // Reset state when modal closes
       if (!isOpen) {
         setMessages([]);
@@ -78,32 +80,42 @@ const PropertyChatModal = ({ isOpen, onClose, property, existingChatRoom }) => {
     };
   }, [isOpen, property?.id, existingChatRoom?.id, user]);
 
+  const mapMessage = (msg) => {
+    const isOwn = msg.senderId === user?.id || msg.senderId === Number(user?.id);
+    return {
+      id: msg.id,
+      sender: msg.senderName || msg.sender || 'Unknown',
+      text: msg.message || msg.content || msg.text || '',
+      isOwn,
+      timestamp: msg.createdAt || msg.sentAt || msg.timestamp,
+    };
+  };
+
+  const loadExistingMessages = async (roomId) => {
+    const existingMessages = await apiClient.getChatMessages(roomId, 50);
+    console.log('📱 Loaded existing messages:', existingMessages);
+    setMessages((existingMessages || []).map(mapMessage));
+  };
+
   const initializeChatRoom = async () => {
     try {
       setLoading(true);
-      
+
+      if (connectionRef.current) {
+        await connectionRef.current.stop();
+        connectionRef.current = null;
+      }
+
       let roomData;
-      
+
       if (existingChatRoom) {
         // Use existing chat room from ChatsPage
         console.log('🏠 Using existing chat room:', existingChatRoom);
         roomData = existingChatRoom;
         setChatRoom(roomData);
-        
-        // Load existing messages for this room using getChatMessages
+
         try {
-          const existingMessages = await apiClient.getChatMessages(roomData.id, 50);
-          console.log('📱 Loaded existing messages:', existingMessages);
-          
-          const formattedMessages = existingMessages.map(msg => ({
-            id: msg.id,
-            sender: msg.senderName || msg.sender || 'Unknown',
-            text: msg.content || msg.message || msg.text || '',
-            isOwn: msg.senderId === user?.id || msg.senderName === user?.name,
-            timestamp: msg.sentAt || msg.timestamp || msg.createdAt
-          }));
-          
-          setMessages(formattedMessages);
+          await loadExistingMessages(roomData.id);
         } catch (messageError) {
           console.error('❌ Failed to load existing messages:', messageError);
           setMessages([]);
@@ -114,34 +126,39 @@ const PropertyChatModal = ({ isOpen, onClose, property, existingChatRoom }) => {
         roomData = await apiClient.createOrGetChatRoom(property.id);
         console.log('🏠 Chat room data:', roomData);
         setChatRoom(roomData);
+
+        try {
+          await loadExistingMessages(roomData.id);
+        } catch (messageError) {
+          console.error('❌ Failed to load existing messages:', messageError);
+          setMessages([]);
+        }
       }
-      
+
       // Set up SignalR connection
       const conn = createChatConnection();
-      
+
       conn.on('ReceiveMessage', (msg) => {
         console.log('📨 Property chat message received:', msg);
-        
-        const messageText = typeof msg === 'string' ? msg : (msg.content || msg.message || msg.text || 'Unknown message');
-        const senderName = msg.senderName || msg.sender || msg.user || msg.from || 'Unknown';
-        const messageId = msg.id || msg.messageId || Date.now();
-        const timestamp = msg.sentAt || msg.timestamp || msg.createdAt || new Date().toISOString();
-        
-        const isOwnMessage = senderName === user?.name || 
-                            msg.senderId === user?.id ||
-                            msg.userId === user?.id ||
-                            msg.isFromCurrentUser === true;
-        
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: messageId,
-            sender: senderName,
-            text: messageText,
-            isOwn: isOwnMessage,
-            timestamp: timestamp,
-          },
-        ]);
+
+        const messageId = msg.id || msg.messageId;
+        const isOwnMessage = msg.senderId === user?.id || msg.senderId === Number(user?.id);
+
+        setMessages((prev) => {
+          if (messageId && prev.some((m) => m.id === messageId)) {
+            return prev;
+          }
+          return [
+            ...prev,
+            {
+              id: messageId || Date.now(),
+              sender: msg.senderName || msg.sender || msg.user || msg.from || 'Unknown',
+              text: msg.message || msg.content || msg.text || 'Unknown message',
+              isOwn: isOwnMessage,
+              timestamp: msg.createdAt || msg.sentAt || msg.timestamp || new Date().toISOString(),
+            },
+          ];
+        });
       });
 
       conn.onclose(() => {
@@ -170,6 +187,7 @@ const PropertyChatModal = ({ isOpen, onClose, property, existingChatRoom }) => {
         await joinChatRoom(conn, roomData.id);
         console.log(`✅ Joined chat room ${roomData.id}`);
         
+        connectionRef.current = conn;
         setConnection(conn);
       } catch (signalRError) {
         console.error('❌ SignalR connection failed:', signalRError);
@@ -177,26 +195,6 @@ const PropertyChatModal = ({ isOpen, onClose, property, existingChatRoom }) => {
         setConnection(null);
         throw new Error('SignalR kapcsolat nem sikerült. Valós idejű chat nem elérhető.');
       }
-      
-      // Load existing messages
-      if (roomData.id) {
-        try {
-          const existingMessages = await apiClient.getChatMessages(roomData.id);
-          console.log('🏠 Existing messages:', existingMessages);
-          if (existingMessages && existingMessages.length > 0) {
-            setMessages(existingMessages.map(msg => ({
-              id: msg.id,
-              sender: msg.senderName,
-              text: msg.message,
-              isOwn: msg.senderName === user?.name,
-              timestamp: msg.createdAt,
-            })));
-          }
-        } catch (msgError) {
-          console.log('🏠 No existing messages or error loading them:', msgError.message);
-        }
-      }
-      
     } catch (error) {
       console.error('❌ Failed to initialize chat room:', error);
       console.error('❌ Error details:', {
