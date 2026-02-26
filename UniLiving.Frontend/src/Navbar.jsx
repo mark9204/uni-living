@@ -73,15 +73,16 @@ function Navbar() {
             </Button>
             {user && (
               <Button
+                as={RouterLink}
+                to="/chats"
                 variant="ghost"
                 size="md"
-                onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
                 _hover={{
                   bg: yellowHover,
                   color: yellowHoverText,
                 }}
               >
-                Chat
+                Beszélgetések
               </Button>
             )}
             <Button variant="ghost" size="md"

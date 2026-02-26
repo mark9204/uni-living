@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
     Box,
     Container,
@@ -20,14 +20,19 @@ import {
 } from '@chakra-ui/react';
 import { FaBed, FaRulerCombined, FaMapMarkerAlt, FaUser, FaCheckCircle, FaTimesCircle, FaBath, FaCalendarAlt, FaEnvelope, FaPhone } from 'react-icons/fa';
 import { apiClient } from './api/client';
+import { useAuth } from './AuthContext';
+import PropertyChatModal from './PropertyChatModal';
 
 const PropertyOverviewPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const toast = useToast();
+    const { user } = useAuth();
     const [property, setProperty] = useState(null);
     const [loading, setLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
     const pageBg = useColorModeValue('gray.50', 'gray.800');
     const cardBg = useColorModeValue('white', 'gray.700');
@@ -39,6 +44,15 @@ const PropertyOverviewPage = () => {
     useEffect(() => {
         loadProperty();
     }, [id]);
+
+    // Check if we should automatically open the chat modal (when navigated from ChatsPage)
+    useEffect(() => {
+        if (location.state?.openChat && property && user) {
+            setIsChatModalOpen(true);
+            // Clear the state to prevent reopening on re-renders
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state, property, user]);
 
     const loadProperty = async () => {
         try {
@@ -189,12 +203,17 @@ const PropertyOverviewPage = () => {
                                 width="100%"
                                 alignSelf="center"
                                 onClick={() => {
-                                    toast({
-                                        title: 'Kapcsolatfelvétel',
-                                        description: 'Ez a funkció hamarosan elérhető lesz!',
-                                        status: 'info',
-                                        duration: 3000,
-                                    });
+                                    if (!user) {
+                                        toast({
+                                            title: 'Bejelentkezés szükséges',
+                                            description: 'A kapcsolatfelvételhez jelentkezzen be!',
+                                            status: 'warning',
+                                            duration: 3000,
+                                        });
+                                        navigate('/login');
+                                        return;
+                                    }
+                                    setIsChatModalOpen(true);
                                 }}
                             >
                                 Kapcsolatfelvétel
@@ -355,6 +374,13 @@ const PropertyOverviewPage = () => {
                     </GridItem>
                 </Grid>
             </Container>
+            
+            {/* Property Chat Modal */}
+            <PropertyChatModal
+                isOpen={isChatModalOpen}
+                onClose={() => setIsChatModalOpen(false)}
+                property={property}
+            />
         </Box>
     );
 };

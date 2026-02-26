@@ -12,6 +12,7 @@ import {
   Badge,
   Spinner,
   Tooltip,
+  useToast,
 } from '@chakra-ui/react';
 import { ChatIcon, CloseIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { useAuth } from './AuthContext';
@@ -23,19 +24,24 @@ import {
   userTyping as hubUserTyping,
   userStoppedTyping as hubUserStoppedTyping,
 } from './api/chatHub';
+import { apiClient } from './api/client';
 
 const TYPING_DEBOUNCE_MS = 1500;
 
 function ChatOverlay() {
   const { user } = useAuth();
+  const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [connection, setConnection] = useState(null);
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
-  const [chatRoomId, setChatRoomId] = useState(1); // default room
+  const [chatRoomId, setChatRoomId] = useState(null); // Start with null, will be set dynamically
+  const [currentRoom, setCurrentRoom] = useState(null);
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [unreadCount, setUnreadCount] = useState(0);
+  const [availableRooms, setAvailableRooms] = useState([]);
+  const [loadingRooms, setLoadingRooms] = useState(false);
 
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -51,7 +57,7 @@ function ChatOverlay() {
 
   // ---- Connection lifecycle ----
   useEffect(() => {
-    if (!user) return; // must be logged in
+    if (!user || !chatRoomId) return; // must be logged in and have a room selected
 
     const conn = createChatConnection();
 
@@ -74,17 +80,34 @@ function ChatOverlay() {
       console.log('🤔 Is own message?', isOwnMessage);
       console.log('📝 Message details:', { messageText, senderName, messageId, timestamp });
       
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: messageId,
-          sender: senderName,
-          text: messageText,
-          isOwn: isOwnMessage,
-          timestamp: timestamp,
-        },
-      ]);
-      if (!isOpen) setUnreadCount((c) => c + 1);
+      // Check for duplicate messages to prevent double messaging
+      setMessages((prev) => {
+        // Check if message already exists
+        const messageExists = prev.some(existingMsg => 
+          existingMsg.id === messageId ||
+          (existingMsg.text === messageText && 
+           existingMsg.isOwn === isOwnMessage && 
+           Math.abs(new Date(existingMsg.timestamp).getTime() - new Date(timestamp).getTime()) < 5000)
+        );
+        
+        if (messageExists) {
+          console.log('🚫 Duplicate message detected, skipping:', messageId);
+          return prev;
+        }
+        
+        return [
+          ...prev,
+          {
+            id: messageId,
+            sender: isOwnMessage ? 'Én' : senderName,
+            text: messageText,
+            isOwn: isOwnMessage,
+            timestamp: timestamp,
+          },
+        ];
+      });
+      
+      if (!isOpen && !isOwnMessage) setUnreadCount((c) => c + 1);
     });
 
     conn.on('MessageRead', (messageId) => {
@@ -130,9 +153,11 @@ function ChatOverlay() {
       })
       .then(() => {
         console.log(`✅ Joined chat room ${chatRoomId}`);
+        // Load existing messages for this room
+        return loadChatMessages(chatRoomId);
       })
       .catch((err) => {
-        console.error('❌ Join room failed, but chat will still work:', err);
+        console.error('❌ Connection or room join failed:', err);
         // Set connected to true so chat functionality works even if room join fails
         setConnected(true);
       });
@@ -147,10 +172,91 @@ function ChatOverlay() {
 
   // ---- Listen for global open-chat event ----
   useEffect(() => {
-    const handler = () => setIsOpen(true);
+    const handler = (event) => {
+      console.log('🔔 Received open-chat event:', event.detail);
+      if (event.detail?.roomId) {
+        // Open specific room
+        setChatRoomId(event.detail.roomId);
+        if (event.detail.roomInfo) {
+          setCurrentRoom(event.detail.roomInfo);
+        }
+      } else if (event.detail?.propertyId) {
+        // Create/get room for property
+        handleOpenPropertyChat(event.detail.propertyId);
+      }
+      setIsOpen(true);
+    };
     window.addEventListener('open-chat', handler);
     return () => window.removeEventListener('open-chat', handler);
   }, []);
+
+  // ---- Load user's chat rooms when overlay opens ----
+  useEffect(() => {
+    if (isOpen && user && !chatRoomId) {
+      loadUserChatRooms();
+    }
+  }, [isOpen, user, chatRoomId]);
+
+  const loadUserChatRooms = async () => {
+    try {
+      setLoadingRooms(true);
+      const rooms = await apiClient.getUserChatRooms();
+      console.log('📱 User chat rooms:', rooms);
+      setAvailableRooms(rooms || []);
+      
+      // Auto-select the first room if available
+      if (rooms && rooms.length > 0) {
+        const firstRoom = rooms[0];
+        setChatRoomId(firstRoom.id);
+        setCurrentRoom(firstRoom);
+      }
+    } catch (error) {
+      console.error('❌ Failed to load user chat rooms:', error);
+    } finally {
+      setLoadingRooms(false);
+    }
+  };
+
+  const loadChatMessages = async (roomId) => {
+    try {
+      const existingMessages = await apiClient.getChatMessages(roomId, 50);
+      console.log('📱 Loaded existing messages:', existingMessages);
+      
+      const formattedMessages = existingMessages.map(msg => {
+        const isOwnMessage = msg.senderId === user?.id || msg.senderName === user?.name;
+        return {
+          id: msg.id,
+          sender: isOwnMessage ? 'Én' : (msg.senderName || msg.sender || 'Unknown'),
+          text: msg.content || msg.message || msg.text || '',
+          isOwn: isOwnMessage,
+          timestamp: msg.sentAt || msg.timestamp || msg.createdAt
+        };
+      });
+      
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error('❌ Failed to load chat messages:', error);
+      setMessages([]); // Clear messages on error
+    }
+  };
+
+  const handleOpenPropertyChat = async (propertyId) => {
+    try {
+      console.log('🏠 Opening chat for property:', propertyId);
+      const roomData = await apiClient.createOrGetChatRoom(propertyId);
+      console.log('🏠 Got room data:', roomData);
+      setChatRoomId(roomData.id);
+      setCurrentRoom(roomData);
+    } catch (error) {
+      console.error('❌ Failed to create/get chat room for property:', error);
+      toast({
+        title: 'Hiba',
+        description: 'A chat szoba nem indítható el.',
+        status: 'error',
+        duration: 3000,
+      });
+    }
+  };
 
   // ---- Auto-scroll ----
   useEffect(() => {
@@ -159,7 +265,7 @@ function ChatOverlay() {
 
   // ---- Mark as read when overlay opens ----
   useEffect(() => {
-    if (isOpen && connection && connected) {
+    if (isOpen && connection && connected && chatRoomId) {
       markChatRoomAsRead(connection, chatRoomId).catch(() => {});
       setUnreadCount(0);
     }
@@ -167,7 +273,7 @@ function ChatOverlay() {
 
   // ---- Typing indicator with debounce ----
   const handleTyping = useCallback(() => {
-    if (!connection || !connected) return;
+    if (!connection || !connected || !chatRoomId) return;
 
     if (!isTypingRef.current) {
       isTypingRef.current = true;
@@ -184,36 +290,52 @@ function ChatOverlay() {
   // ---- Send ----
   const handleSend = async () => {
     const text = inputValue.trim();
-    if (!text || !connection || !connected) return;
+    if (!text || !chatRoomId) return;
 
     console.log('📤 Sending message:', text);
-    
-    // Add optimistic local message so user sees their own message immediately
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        sender: user?.name ?? 'Me',
-        text,
-        isOwn: true,
-        timestamp: new Date().toISOString(),
-      },
-    ]);
+
     setInputValue('');
 
     // Stop typing indicator
     clearTimeout(typingTimeoutRef.current);
-    if (isTypingRef.current) {
+    if (isTypingRef.current && connection && connected) {
       isTypingRef.current = false;
       hubUserStoppedTyping(connection, chatRoomId).catch(() => {});
     }
 
-    try {
-      await hubSendMessage(connection, chatRoomId, text);
-      console.log('✅ Message sent successfully');
-    } catch (err) {
-      console.error('❌ Failed to send message:', err);
-      // On error, maybe add a "failed to send" indicator
+    let sentViaSignalR = false;
+    if (connection && connected) {
+      try {
+        await hubSendMessage(connection, chatRoomId, text);
+        sentViaSignalR = true;
+        console.log('✅ Message sent via SignalR');
+      } catch (err) {
+        console.error('❌ SignalR send failed, falling back to REST:', err);
+      }
+    }
+
+    if (!sentViaSignalR) {
+      try {
+        await apiClient.sendChatMessage(chatRoomId, text);
+        console.log('✅ Message sent via REST');
+        
+        // Only add optimistic message if REST fallback is used
+        // (SignalR will trigger ReceiveMessage event)
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            sender: 'Én',
+            text,
+            isOwn: true,
+            timestamp: new Date().toISOString(),
+          },
+        ]);
+      } catch (err) {
+        console.error('❌ REST send failed:', err);
+        // Re-add the text to input if sending failed completely
+        setInputValue(text);
+      }
     }
   };
 
@@ -289,7 +411,7 @@ function ChatOverlay() {
             <HStack>
               <ChatIcon />
               <Text fontWeight="bold" fontSize="lg">
-                Chat
+                {currentRoom ? (currentRoom.propertyTitle || currentRoom.property?.title || `Szoba #${currentRoom.id}`) : 'Chat'}
               </Text>
               {!connected && <Spinner size="xs" ml={2} />}
             </HStack>
@@ -313,7 +435,52 @@ function ChatOverlay() {
             spacing={3}
             align="stretch"
           >
-            {messages.length === 0 && (
+            {!chatRoomId ? (
+              <VStack spacing={4} mt={8}>
+                {loadingRooms ? (
+                  <>
+                    <Spinner />
+                    <Text color="gray.400" textAlign="center" fontSize="sm">
+                      Beszélgetések betöltése...
+                    </Text>
+                  </>
+                ) : availableRooms.length === 0 ? (
+                  <Text color="gray.400" textAlign="center" fontSize="sm">
+                    Nincsenek aktív beszélgetések.
+                    <br />Ingatlan oldalon indíthat újat!
+                  </Text>
+                ) : (
+                  <>
+                    <Text color="gray.400" textAlign="center" fontSize="sm">
+                      Válasszon beszélgetést:
+                    </Text>
+                    {availableRooms.map((room) => (
+                      <Box
+                        key={room.id}
+                        p={3}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        cursor="pointer"
+                        _hover={{ bg: inputBg }}
+                        onClick={() => {
+                          setChatRoomId(room.id);
+                          setCurrentRoom(room);
+                        }}
+                      >
+                        <Text fontWeight="bold" fontSize="sm">
+                          {room.propertyTitle || room.property?.title || `Szoba #${room.id}`}
+                        </Text>
+                        {room.lastMessage && (
+                          <Text fontSize="xs" color="gray.500" mt={1}>
+                            {room.lastMessage.content || room.lastMessage.text}
+                          </Text>
+                        )}
+                      </Box>
+                    ))}
+                  </>
+                )}
+              </VStack>
+            ) : messages.length === 0 ? (
               <Text
                 color="gray.400"
                 textAlign="center"
@@ -322,8 +489,8 @@ function ChatOverlay() {
               >
                 Nincsenek üzenetek. Írj elsőként!
               </Text>
-            )}
-            {messages.map((msg) => (
+            ) : null}
+            {chatRoomId && messages.map((msg) => (
               <Flex
                 key={msg.id}
                 justify={msg.isOwn ? 'flex-end' : 'flex-start'}
@@ -366,7 +533,7 @@ function ChatOverlay() {
           {/* Input area */}
           <HStack px={4} py={3} borderTopWidth="1px" flexShrink={0}>
             <Input
-              placeholder="Üzenet írása…"
+              placeholder={chatRoomId ? "Üzenet írása…" : "Válassz beszélgetést fent"}
               value={inputValue}
               onChange={(e) => {
                 setInputValue(e.target.value);
@@ -376,13 +543,14 @@ function ChatOverlay() {
               bg={inputBg}
               size="md"
               borderRadius="full"
+              isDisabled={!chatRoomId}
             />
             <IconButton
               icon={<ArrowForwardIcon />}
               colorScheme="yellow"
               borderRadius="full"
               onClick={handleSend}
-              isDisabled={!inputValue.trim() || !connected}
+              isDisabled={!inputValue.trim() || !connected || !chatRoomId}
               aria-label="Send message"
             />
           </HStack>

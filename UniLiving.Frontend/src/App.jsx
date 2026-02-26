@@ -8,9 +8,9 @@ import RegisterPage from './RegisterPage';
 import PropertiesPage from './PropertiesPage';
 import UploadPropertyPage from './UploadPropertyPage';
 import PropertyOverviewPage from './PropertyOverviewPage';
+import ChatsPage from './ChatsPage';
 import { AuthProvider } from './AuthContext';
 import Navbar from './Navbar';
-import ChatOverlay from './ChatOverlay';
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
@@ -44,6 +44,7 @@ function AppRoutes() {
           <Route path="/properties" element={<PropertiesPage />} />
           <Route path="/property/:id" element={<PropertyOverviewPage />} />
           <Route path="/upload" element={<UploadPropertyPage />} />
+          <Route path="/chats" element={<ChatsPage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
@@ -59,7 +60,6 @@ function App() {
           <Box flex="1" overflow="hidden">
             <AppRoutes />
           </Box>
-          <ChatOverlay />
         </Flex>
       </AuthProvider>
     </Router>

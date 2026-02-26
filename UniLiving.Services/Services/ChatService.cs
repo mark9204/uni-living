@@ -16,6 +16,10 @@ namespace UniLiving.Services.Services
         Task<ChatMessageDto> SendMessageAsync(int chatRoomId, int senderId, string message);
         Task<ChatMessageDto?> MarkMessageAsReadAsync(int messageId, int userId);
         Task<IReadOnlyList<ChatMessageDto>> MarkChatRoomAsReadAsync(int chatRoomId, int userId);
+        Task<IReadOnlyList<ChatRoomDto>> GetUserChatRoomsAsync(int userId);
+        Task<ChatRoomDto> GetOrCreateChatRoomAsync(int propertyId, int userId);
+        Task<ChatRoomDto?> GetChatRoomByIdAsync(int roomId, int userId);
+        Task<IReadOnlyList<ChatMessageDto>> GetChatMessagesAsync(int roomId, int userId, int take = 50);
     }
 
     public class ChatService : IChatService
@@ -149,6 +153,157 @@ namespace UniLiving.Services.Services
                     CreatedAt = message.CreatedAt,
                     ReadAt = message.ReadAt,
                     SenderName = $"{message.Sender.FirstName} {message.Sender.LastName}"
+                })
+                .ToList();
+        }
+
+        public async Task<IReadOnlyList<ChatRoomDto>> GetUserChatRoomsAsync(int userId)
+        {
+            var rooms = await _context.ChatRooms
+                .Where(cr => (cr.TenantId == userId || cr.LandlordId == userId) && cr.IsActive)
+                .Include(cr => cr.Tenant)
+                .Include(cr => cr.Landlord)
+                .Include(cr => cr.Property)
+                .Include(cr => cr.Messages)
+                .OrderByDescending(cr => cr.Messages.Max(m => m.CreatedAt))
+                .ToListAsync();
+
+            return rooms
+                .Select(room => new ChatRoomDto
+                {
+                    Id = room.Id,
+                    PropertyId = room.PropertyId,
+                    TenantId = room.TenantId,
+                    LandlordId = room.LandlordId,
+                    IsActive = room.IsActive,
+                    CreatedAt = room.CreatedAt,
+                    Messages = room.Messages
+                        .OrderByDescending(m => m.CreatedAt)
+                        .Take(1)
+                        .Select(m => new ChatMessageDto
+                        {
+                            Id = m.Id,
+                            ChatRoomId = m.ChatRoomId,
+                            SenderId = m.SenderId,
+                            Message = m.Message,
+                            IsRead = m.IsRead,
+                            CreatedAt = m.CreatedAt,
+                            ReadAt = m.ReadAt,
+                            SenderName = m.Sender.FirstName + " " + m.Sender.LastName
+                        })
+                        .ToList()
+                })
+                .ToList();
+        }
+
+        public async Task<ChatRoomDto> GetOrCreateChatRoomAsync(int propertyId, int userId)
+        {
+            var property = await _context.Properties
+                .FirstOrDefaultAsync(p => p.Id == propertyId);
+            if (property == null)
+                throw new KeyNotFoundException("Property not found");
+
+            var landlordId = property.OwnerId;
+            var tenantId = userId;
+
+            if (landlordId == userId)
+                throw new InvalidOperationException("Landlord cannot start chat with themselves");
+
+            var existingRoom = await _context.ChatRooms
+                .FirstOrDefaultAsync(cr => cr.PropertyId == propertyId && cr.TenantId == tenantId && cr.LandlordId == landlordId);
+
+            if (existingRoom != null)
+            {
+                return new ChatRoomDto
+                {
+                    Id = existingRoom.Id,
+                    PropertyId = existingRoom.PropertyId,
+                    TenantId = existingRoom.TenantId,
+                    LandlordId = existingRoom.LandlordId,
+                    IsActive = existingRoom.IsActive,
+                    CreatedAt = existingRoom.CreatedAt,
+                    Messages = new()
+                };
+            }
+
+            var newRoom = new ChatRoom
+            {
+                PropertyId = propertyId,
+                TenantId = tenantId,
+                LandlordId = landlordId,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.ChatRooms.Add(newRoom);
+            await _context.SaveChangesAsync();
+
+            return new ChatRoomDto
+            {
+                Id = newRoom.Id,
+                PropertyId = newRoom.PropertyId,
+                TenantId = newRoom.TenantId,
+                LandlordId = newRoom.LandlordId,
+                IsActive = newRoom.IsActive,
+                CreatedAt = newRoom.CreatedAt,
+                Messages = new()
+            };
+        }
+
+        public async Task<ChatRoomDto?> GetChatRoomByIdAsync(int roomId, int userId)
+        {
+            var room = await _context.ChatRooms
+                .Include(cr => cr.Tenant)
+                .Include(cr => cr.Landlord)
+                .Include(cr => cr.Property)
+                .FirstOrDefaultAsync(cr => cr.Id == roomId);
+
+            if (room == null)
+                return null;
+
+            var hasAccess = room.TenantId == userId || room.LandlordId == userId;
+            if (!hasAccess)
+                throw new UnauthorizedAccessException("Access denied to this chat room");
+
+            return new ChatRoomDto
+            {
+                Id = room.Id,
+                PropertyId = room.PropertyId,
+                TenantId = room.TenantId,
+                LandlordId = room.LandlordId,
+                IsActive = room.IsActive,
+                CreatedAt = room.CreatedAt,
+                Messages = new()
+            };
+        }
+
+        public async Task<IReadOnlyList<ChatMessageDto>> GetChatMessagesAsync(int roomId, int userId, int take = 50)
+        {
+            var hasAccess = await UserHasAccessToChatRoomAsync(roomId, userId);
+            if (!hasAccess)
+                throw new UnauthorizedAccessException("Access denied to this chat room");
+
+            var messages = await _context.ChatMessages
+                .Where(m => m.ChatRoomId == roomId)
+                .Include(m => m.Sender)
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(take)
+                .ToListAsync();
+
+            return messages
+                .AsEnumerable()
+                .Reverse()
+                .Select(m => new ChatMessageDto
+                {
+                    Id = m.Id,
+                    ChatRoomId = m.ChatRoomId,
+                    SenderId = m.SenderId,
+                    Message = m.Message,
+                    IsRead = m.IsRead,
+                    CreatedAt = m.CreatedAt,
+                    ReadAt = m.ReadAt,
+                    SenderName = $"{m.Sender.FirstName} {m.Sender.LastName}"
                 })
                 .ToList();
         }
