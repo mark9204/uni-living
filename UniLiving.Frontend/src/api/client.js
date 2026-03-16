@@ -367,6 +367,52 @@ class ApiClient {
     console.log('🔧 Message sent:', messageData);
     return messageData;
   }
+
+  // --- Notifications & Preferences ---
+
+  async getMyPreferences() {
+    const response = await fetch(`${API_BASE_URL}/api/preferences`, {
+      method: 'GET',
+      headers: this.getHeaders(true)
+    });
+    if (!response.ok) throw new Error('Failed to fetch preferences');
+    return response.json();
+  }
+
+  async addPreference(preferenceDto) {
+    const response = await fetch(`${API_BASE_URL}/api/preferences`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify(preferenceDto)
+    });
+    if (!response.ok) throw new Error('Failed to create preference');
+    return response.json();
+  }
+
+  async deletePreference(id) {
+    const response = await fetch(`${API_BASE_URL}/api/preferences/${id}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(true)
+    });
+    if (!response.ok) throw new Error('Failed to delete preference');
+  }
+
+  async getNotifications() {
+    const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+      method: 'GET',
+      headers: this.getHeaders(true)
+    });
+    if (!response.ok) throw new Error('Failed to fetch notifications');
+    return response.json();
+  }
+
+  async markNotificationRead(id) {
+    const response = await fetch(`${API_BASE_URL}/api/notifications/${id}/read`, {
+      method: 'PUT',
+      headers: this.getHeaders(true)
+    });
+    if (!response.ok) throw new Error('Failed to mark notification as read');
+  }
 }
 
 export const apiClient = new ApiClient();

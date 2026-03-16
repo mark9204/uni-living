@@ -81,6 +81,26 @@ namespace UniLiving.Hubs
                 await Clients.Group($"chatroom_{chatRoomId}")
                     .SendAsync("ReceiveMessage", chatMessage);
 
+                // Push Generic Message Notification
+                var notifService = Context.GetHttpContext()?.RequestServices?.GetService<NotificationService>();
+                var chatRoom = await _chatService.GetChatRoomByIdAsync(chatRoomId, userId.Value);
+                if (notifService != null && chatRoom != null)
+                {
+                    var recipientId = chatRoom.TenantId == userId.Value ? chatRoom.LandlordId : chatRoom.TenantId;
+                    
+                    var newNotif = new UniLiving.DataContext.Entities.Notification
+                    {
+                        UserId = recipientId,
+                        Title = $"Új üzenet: {chatMessage.SenderName}",
+                        Message = message.Length > 40 ? message.Substring(0, 37) + "..." : message,
+                        RelatedEntityType = "Message",
+                        RelatedEntityId = chatRoomId,
+                        IsRead = false
+                    };
+                    var dto = await notifService.CreateNotificationAsync(newNotif);
+                    await Clients.Group($"user_{recipientId}").SendAsync("ReceiveNotification", dto);
+                }
+
                 _logger.LogInformation($"Message sent in chat room {chatRoomId} by user {userId}");
             }
             catch (Exception ex)
