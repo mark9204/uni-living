@@ -72,6 +72,47 @@ namespace UniLiving.Controllers
         public async Task<ActionResult<PropertyDto>> Create([FromBody] PropertyDto propertyDto)
         {
             var created = await _propertyService.CreatePropertyAsync(propertyDto, _httpContextAccessor);
+            
+            try 
+            {
+                // Értesítjük a felhasználókat, akiknek a "mentett keresése" egyezik ezzel
+                var prefService = HttpContext.RequestServices.GetService<SearchPreferenceService>();
+                var notifService = HttpContext.RequestServices.GetService<NotificationService>();
+                var hubContext = HttpContext.RequestServices.GetService<Microsoft.AspNetCore.SignalR.IHubContext<UniLiving.Hubs.ChatHub>>();
+                var context = HttpContext.RequestServices.GetService<UniLiving.DataContext.UniDBContext>();
+
+                if (prefService != null && notifService != null && hubContext != null && context != null)
+                {
+                    // Lekérjük a konkrét frissen mentett Property entitást, hogy a paramétereit megvizsgáljuk
+                    var propertyEntity = await context.Properties.FindAsync(created.Id);
+                    if (propertyEntity != null)
+                    {
+                        var matchingUserIds = await prefService.GetMatchingUserIdsAsync(propertyEntity);
+                        foreach (var targetUserId in matchingUserIds)
+                        {
+                            var newNotif = new UniLiving.DataContext.Entities.Notification
+                            {
+                                UserId = targetUserId,
+                                Title = "Új hozzád illő hirdetés!",
+                                Message = $"{created.Title} - {created.Price} Ft, {created.City}",
+                                RelatedEntityType = "PropertyAlert",
+                                RelatedEntityId = created.Id,
+                                IsRead = false
+                            };
+                            
+                            var dto = await notifService.CreateNotificationAsync(newNotif);
+                            
+                            // Real-time SignalR push
+                            await Microsoft.AspNetCore.SignalR.ClientProxyExtensions.SendAsync(hubContext.Clients.Group($"user_{targetUserId}"), "ReceiveNotification", dto);
+                        }
+                    }
+                }
+            }
+            catch (System.Exception ex) 
+            { 
+               // Logolhatnánk, de nem hagyjuk, hogy megszakítsa a létrehozás folyamatát 
+            }
+
             return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
         }
 

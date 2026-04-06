@@ -48,6 +48,10 @@ namespace UniLiving.Services
             // PropertyImage mapping
             CreateMap<PropertyImage, PropertyImageDto>()
                 .ReverseMap();
+
+            // Notification scaling
+            CreateMap<Notification, NotificationDto>().ReverseMap();
+            CreateMap<SearchPreference, SearchPreferenceDto>().ReverseMap();
         }
     }
 }
