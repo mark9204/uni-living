@@ -16,6 +16,7 @@ namespace UniLiving.Services.Services
         Task<UserDto> CreateUserAsync(UserDto userDto);
         Task<UserDto> UpdateUserAsync(int id, UserDto userDto);
         Task<bool> DeleteUserAsync(int id);
+        Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto request);
     }
 
     public class UserService : IUserService
@@ -80,6 +81,20 @@ namespace UniLiving.Services.Services
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
+            return true;
+        }
+
+        public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto request)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+                return false;
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
             return true;
         }
     }

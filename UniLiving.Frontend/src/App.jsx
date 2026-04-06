@@ -12,6 +12,8 @@ import ChatsPage from './ChatsPage';
 import PreferencesPage from './PreferencesPage';
 import LandlordDashboardPage from './LandlordDashboardPage';
 import TenantDashboardPage from './TenantDashboardPage';
+import AboutPage from './AboutPage';
+import ProfilePage from './ProfilePage';
 import { AuthProvider } from './AuthContext';
 import { NotificationProvider } from './NotificationContext';
 import Navbar from './Navbar';
@@ -52,6 +54,8 @@ function AppRoutes() {
           <Route path="/preferences" element={<PreferencesPage />} />
           <Route path="/landlord-dashboard" element={<LandlordDashboardPage />} />
           <Route path="/tenant-dashboard" element={<TenantDashboardPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>

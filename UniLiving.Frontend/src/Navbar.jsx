@@ -119,14 +119,23 @@ function Navbar() {
                 </Button>
               </>
             )}
-            <Button variant="ghost" size="md"
-              _hover={{
-                bg: yellowHover,
-                color: yellowHoverText,
-              }}>
-              Profil
-            </Button>
-            <Button variant="ghost" size="md"
+            {user && (
+              <Button
+                as={RouterLink}
+                to="/profile"
+                variant="ghost" size="md"
+                _hover={{
+                  bg: yellowHover,
+                  color: yellowHoverText,
+                }}>
+                Profil
+              </Button>
+            )}
+            <Button
+              as={RouterLink}
+              to="/about"
+              variant="ghost" 
+              size="md"
               _hover={{
                 bg: yellowHover,
                 color: yellowHoverText,

@@ -66,5 +66,22 @@ namespace UniLiving.Controllers
                 return NotFound();
             return NoContent();
         }
+
+        [HttpPut("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request)
+        {
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var success = await _userService.ChangePasswordAsync(userId, request);
+            if (!success)
+                return BadRequest(new { message = "Incorrect current password." });
+
+            return Ok(new { message = "Password updated successfully." });
+        }
     }
 }

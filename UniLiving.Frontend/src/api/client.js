@@ -425,6 +425,38 @@ class ApiClient {
     });
     if (!response.ok) throw new Error('Failed to mark notification as read');
   }
+
+  async getUser(id) {
+    const response = await fetch(`${API_BASE_URL}/api/User/${id}`, {
+      method: 'GET',
+      headers: this.getHeaders(true)
+    });
+    if (!response.ok) throw new Error('Failed to fetch user');
+    return response.json();
+  }
+
+  async updateUser(id, data) {
+    const response = await fetch(`${API_BASE_URL}/api/User/${id}`, {
+      method: 'PUT',
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update user');
+    return response.json();
+  }
+
+  async changePassword(data) {
+    const response = await fetch(`${API_BASE_URL}/api/User/change-password`, {
+      method: 'PUT',
+      headers: this.getHeaders(true),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to change password');
+    }
+    return response.json();
+  }
 }
 
 export const apiClient = new ApiClient();
