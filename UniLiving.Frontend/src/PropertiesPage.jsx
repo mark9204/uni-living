@@ -40,6 +40,7 @@ function PropertiesPage() {
     const headingColor = useColorModeValue('gray.800', 'white');
     const textColor = useColorModeValue('gray.600', 'gray.400');
     const noPropertyBg = useColorModeValue('white', 'gray.700');
+    const propertyTitleColor = useColorModeValue('yellow.500', 'white');
 
     useEffect(() => {
         let isMounted = true;
@@ -303,7 +304,7 @@ function PropertiesPage() {
 
                                             {/* Adatok */}
                                             <Box p={4}>
-                                                <Heading size="md" mb={2} noOfLines={1} color={useColorModeValue('yellow.500', 'white')}>
+                                                <Heading size="md" mb={2} noOfLines={1} color={propertyTitleColor}>
                                                     {property.title}    
                                                 </Heading>
                                                 <Text color={textColor} fontSize="sm" mb={2} noOfLines={1}>

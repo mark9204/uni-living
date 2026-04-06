@@ -82,6 +82,7 @@ namespace UniLiving.Services.Services
             }
 
             _mapper.Map(propertyDto, property);
+            _context.Entry(property).Property(p => p.Id).IsModified = false;
             property.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

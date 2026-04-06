@@ -44,6 +44,7 @@ function AppRoutes() {
           <Route path="/properties" element={<PropertiesPage />} />
           <Route path="/property/:id" element={<PropertyOverviewPage />} />
           <Route path="/upload" element={<UploadPropertyPage />} />
+          <Route path="/upload-property/:id" element={<UploadPropertyPage />} />
           <Route path="/chats" element={<ChatsPage />} />
         </Routes>
       </motion.div>

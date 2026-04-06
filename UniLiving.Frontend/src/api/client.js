@@ -204,13 +204,25 @@ class ApiClient {
   }
 
   async updateProperty(id, data) {
+    console.log('API: updateProperty called with:', { id, data });
     const response = await fetch(`${API_BASE_URL}/api/property/${id}`, {
       method: 'PUT',
       headers: this.getHeaders(true),
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) throw new Error('Failed to update property');
+    console.log('API: updateProperty response status:', response.status);
+
+    if (!response.ok) {
+      let error;
+      try {
+        error = await response.json();
+        console.error('Property update error from backend:', error);
+      } catch {
+        error = { message: `HTTP ${response.status}: ${response.statusText}` };
+      }
+      throw new Error(error.message || error.title || JSON.stringify(error) || 'Failed to update property');
+    }
     return response.json();
   }
 

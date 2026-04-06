@@ -195,29 +195,45 @@ const PropertyOverviewPage = () => {
                                 </Text>
                             </Box>
 
-                            {/* Kapcsolatfelvétel gomb */}
-                            <Button
-                                colorScheme="yellow"
-                                size="lg"
-                                marginTop={25}
-                                width="100%"
-                                alignSelf="center"
-                                onClick={() => {
-                                    if (!user) {
-                                        toast({
-                                            title: 'Bejelentkezés szükséges',
-                                            description: 'A kapcsolatfelvételhez jelentkezzen be!',
-                                            status: 'warning',
-                                            duration: 3000,
-                                        });
-                                        navigate('/login');
-                                        return;
-                                    }
-                                    setIsChatModalOpen(true);
-                                }}
-                            >
-                                Kapcsolatfelvétel
-                            </Button>
+                            {/* Kapcsolatfelvétel gomb - csak akkor jelenik meg, ha a felhasználó nem a tulajdonos */}
+                            {user && user.id !== property.ownerId && user.id !== property.owner?.id && (
+                                <Button
+                                    colorScheme="yellow"
+                                    size="lg"
+                                    marginTop={25}
+                                    width="100%"
+                                    alignSelf="center"
+                                    onClick={() => {
+                                        if (!user) {
+                                            toast({
+                                                title: 'Bejelentkezés szükséges',
+                                                description: 'A kapcsolatfelvételhez jelentkezzen be!',
+                                                status: 'warning',
+                                                duration: 3000,
+                                            });
+                                            navigate('/login');
+                                            return;
+                                        }
+                                        setIsChatModalOpen(true);
+                                    }}
+                                >
+                                    Kapcsolatfelvétel
+                                </Button>
+                            )}
+
+                            {/* Módosítás gomb - csak a tulajdonosnak jelenik meg */}
+                            {user && (user.id === property.ownerId || user.id === property.owner?.id) && (
+                                <Button
+                                    colorScheme="blue"
+                                    size="lg"
+                                    marginTop={25}
+                                    width="100%"
+                                    alignSelf="center"
+                                    onClick={() => navigate(`/upload-property/${property.id}`)}
+                                >
+                                    Hirdetés módosítása
+                                </Button>
+                            )}
                             
                         </VStack>
                     </GridItem>
