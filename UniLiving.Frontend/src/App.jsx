@@ -9,7 +9,9 @@ import PropertiesPage from './PropertiesPage';
 import UploadPropertyPage from './UploadPropertyPage';
 import PropertyOverviewPage from './PropertyOverviewPage';
 import ChatsPage from './ChatsPage';
+import PreferencesPage from './PreferencesPage';
 import { AuthProvider } from './AuthContext';
+import { NotificationProvider } from './NotificationContext';
 import Navbar from './Navbar';
 
 const pageVariants = {
@@ -46,6 +48,7 @@ function AppRoutes() {
           <Route path="/upload" element={<UploadPropertyPage />} />
           <Route path="/upload-property/:id" element={<UploadPropertyPage />} />
           <Route path="/chats" element={<ChatsPage />} />
+          <Route path="/preferences" element={<PreferencesPage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
@@ -56,12 +59,14 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Flex direction="column" height="100vh" overflow="hidden">
-          <Navbar />
-          <Box flex="1" overflow="hidden">
-            <AppRoutes />
-          </Box>
-        </Flex>
+        <NotificationProvider>
+          <Flex direction="column" height="100vh" overflow="hidden">
+            <Navbar />
+            <Box flex="1" overflow="hidden" position="relative">
+              <AppRoutes />
+            </Box>
+          </Flex>
+        </NotificationProvider>
       </AuthProvider>
     </Router>
   );
