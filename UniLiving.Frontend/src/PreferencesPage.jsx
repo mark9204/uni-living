@@ -16,14 +16,26 @@ import {
   IconButton,
   Divider,
   useToast,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { apiClient } from './api/client';
 
-const CITIES = ['Budapest', 'Szeged', 'Debrecen', 'Pécs', 'Győr'];
+const CITIES = [
+  'Ajka', 'Baja', 'Békéscsaba', 'Budaörs', 'Budapest', 'Cegléd', 'Debrecen', 
+  'Dunakeszi', 'Dunaújváros', 'Eger', 'Esztergom', 'Gödöllő', 'Gyöngyös', 
+  'Győr', 'Gyula', 'Hajdúböszörmény', 'Hódmezővásárhely', 'Jászberény', 
+  'Kaposvár', 'Kecskemét', 'Keszthely', 'Kiskunfélegyháza', 'Kiskunhalas', 
+  'Miskolc', 'Mosonmagyaróvár', 'Nagykanizsa', 'Nyíregyháza', 'Orosháza', 
+  'Ózd', 'Pápa', 'Pécs', 'Salgótarján', 'Siófok', 'Szeged', 'Szekszárd', 
+  'Szentendre', 'Szentes', 'Székesfehérvár', 'Szigetszentmiklós', 'Szolnok', 
+  'Szombathely', 'Tatabánya', 'Vác', 'Veszprém', 'Zalaegerszeg'
+];
 
 const PreferencesPage = () => {
   const toast = useToast();
+  const bgColor = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.600', 'gray.300');
   const [savedSearches, setSavedSearches] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -125,13 +137,13 @@ const PreferencesPage = () => {
   return (
     <Box p={8} maxW="container.lg" mx="auto">
       <Heading mb={6} color="yellow.500">Mentett keresések és Értesítések</Heading>
-      <Text mb={8} color="gray.600">
+      <Text mb={8} color={textColor}>
         Állítsd be, hogy milyen paraméterű lakások érdekelnek, és mi azonnal értesítünk egy harang ikonon keresztül, ha a feltételeidnek megfelelő új hirdetés kerül fel!
       </Text>
 
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
         {/* Új feltétel hozzáadása űrlap */}
-        <Box as="form" onSubmit={handleSave} bg="white" p={6} borderRadius="md" shadow="sm" borderWidth="1px">
+        <Box as="form" onSubmit={handleSave} bg={bgColor} p={6} borderRadius="md" shadow="sm" borderWidth="1px">
           <Heading size="md" mb={4}>Új értesítés beállítása</Heading>
           
           <VStack spacing={4}>
@@ -169,22 +181,22 @@ const PreferencesPage = () => {
           <Heading size="md" mb={4}>Aktív kereséseid</Heading>
           
           {savedSearches.length === 0 ? (
-            <Text color="gray.500">Jelenleg nincsenek mentett kereséseid.</Text>
+            <Text color={textColor}>Jelenleg nincsenek mentett kereséseid.</Text>
           ) : (
             <VStack spacing={4} align="stretch">
               {savedSearches.map((search) => (
-                <Card key={search.id} size="sm" variant="outline">
+                <Card key={search.id} size="sm" variant="outline" bg={bgColor}>
                   <CardBody>
                     <HStack justify="space-between">
                       <VStack align="start" spacing={1}>
-                        <Text fontWeight="bold" color="yellow.600">
+                        <Text fontWeight="bold" color="yellow.500">
                           {search.cities || 'Bármely város'}
                         </Text>
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color={textColor}>
                           Ár: {search.minPrice ? `${search.minPrice} Ft` : '0 Ft'} - {search.maxPrice ? `${search.maxPrice} Ft` : 'Bármennyi'}
                         </Text>
                         {search.minSize && (
-                          <Text fontSize="sm" color="gray.600">
+                          <Text fontSize="sm" color={textColor}>
                             Méret: {search.minSize}+ m²
                           </Text>
                         )}
