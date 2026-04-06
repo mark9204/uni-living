@@ -9,6 +9,8 @@ import PropertiesPage from './PropertiesPage';
 import UploadPropertyPage from './UploadPropertyPage';
 import PropertyOverviewPage from './PropertyOverviewPage';
 import ChatsPage from './ChatsPage';
+import LandlordDashboardPage from './LandlordDashboardPage';
+import TenantDashboardPage from './TenantDashboardPage';
 import { AuthProvider } from './AuthContext';
 import Navbar from './Navbar';
 
@@ -45,6 +47,8 @@ function AppRoutes() {
           <Route path="/property/:id" element={<PropertyOverviewPage />} />
           <Route path="/upload" element={<UploadPropertyPage />} />
           <Route path="/chats" element={<ChatsPage />} />
+          <Route path="/landlord-dashboard" element={<LandlordDashboardPage />} />
+          <Route path="/tenant-dashboard" element={<TenantDashboardPage />} />
         </Routes>
       </motion.div>
     </AnimatePresence>

@@ -24,6 +24,8 @@ import { apiClient } from "./api/client";
 
 import { useAuth } from "./AuthContext";
 
+import { jwtDecode } from 'jwt-decode';
+
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
 
@@ -68,7 +70,17 @@ export default function LoginPage() {
                 duration: 3000,
                 isClosable: true,
             });
-            navigate("/");
+            try {
+                const decoded = jwtDecode(token);
+                const role = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role || 'Tenant';
+                if (role === 'Landlord' || role === 'Owner') {
+                    navigate("/landlord-dashboard");
+                } else {
+                    navigate("/tenant-dashboard");
+                }
+            } catch (e) {
+                navigate("/");
+            }
         } catch (error) {
             toast({
                 title: "Bejelentkezési hiba",

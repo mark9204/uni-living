@@ -84,6 +84,7 @@ namespace UniLiving
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<IChatService, ChatService>();
+            builder.Services.AddScoped<UniLiving.Services.Interfaces.IDashboardService, UniLiving.Services.Implementations.DashboardService>();
             builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();

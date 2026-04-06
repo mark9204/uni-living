@@ -47,6 +47,20 @@ function Navbar() {
         {/* Center Section - Navigation Links with Upload Button for Landlords */}
         <Flex flex="1" justify="center" align="center">
           <HStack spacing={6}>
+            {user && (
+              <Button
+                as={RouterLink}
+                to={user.role === 'Landlord' || user.role === 'Owner' ? '/landlord-dashboard' : '/tenant-dashboard'}
+                variant="ghost"
+                size="md"
+                _hover={{
+                  bg: yellowHover,
+                  color: yellowHoverText,
+                }}
+              >
+                Vezérlőpult
+              </Button>
+            )}
             {user && (user.role === 'Landlord' || user.role === 'Owner') && (
               <Button
                 as={RouterLink}
