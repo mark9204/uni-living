@@ -49,5 +49,6 @@ namespace UniLiving.DataContext.Entities
         public virtual ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
         public virtual ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public virtual ICollection<ChatRoom> ChatRooms { get; set; } = new List<ChatRoom>();
+        public virtual ICollection<PropertyView> Views { get; set; } = new List<PropertyView>();
     }
 }

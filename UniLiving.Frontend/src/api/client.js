@@ -347,25 +347,37 @@ class ApiClient {
     return response.json();
   }
 
-  async sendChatMessage(roomId, message) {
-    console.log('🔧 Sending chat message to room:', roomId, 'message:', message);
-    const response = await fetch(`${API_BASE_URL}/api/Chat/rooms/${roomId}/messages`, {
-      method: 'POST',
+  // --- DASHBOARD API ENDPOINTS ---
+
+  async getLandlordStats() {
+    const response = await fetch(`${API_BASE_URL}/api/Dashboard/landlord-stats`, {
+      method: 'GET',
       headers: this.getHeaders(true),
-      body: JSON.stringify({ content: message })
     });
 
-    console.log('🔧 Send message API response:', response.status, response.statusText);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('🔧 Send message API error:', errorText);
-      throw new Error(`Failed to send message: ${response.status} ${response.statusText} - ${errorText}`);
+    if (!response.ok) throw new Error('Failed to fetch landlord stats');
+    return response.json();
+  }
+
+  async getTenantStats() {
+    const response = await fetch(`${API_BASE_URL}/api/Dashboard/tenant-stats`, {
+      method: 'GET',
+      headers: this.getHeaders(true),
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch tenant stats');
+    return response.json();
+  }
+
+  async trackPropertyView(propertyId) {
+    try {
+      await fetch(`${API_BASE_URL}/api/Property/${propertyId}/view`, {
+        method: 'POST',
+        headers: this.getHeaders(false),
+      });
+    } catch (error) {
+      console.error('Failed to track property view', error);
     }
-    
-    const messageData = await response.json();
-    console.log('🔧 Message sent:', messageData);
-    return messageData;
   }
 
   // --- Notifications & Preferences ---

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using UniLiving.Services.Services;
 using UniLiving.DataContext.DTOs;
 
@@ -47,6 +48,23 @@ namespace UniLiving.Controllers
             if (property == null)
                 return NotFound();
             return Ok(property);
+        }
+
+        [HttpPost("{id}/view")]
+        public async Task<IActionResult> TrackView(int id, [FromServices] UniLiving.DataContext.UniDBContext context)
+        {
+            // Note: Make sure the Property exists
+            var exists = await context.Properties.AnyAsync(p => p.Id == id);
+            if (!exists) return NotFound();
+
+            var view = new UniLiving.DataContext.Entities.PropertyView
+            {
+                PropertyId = id,
+                ViewedAt = DateTime.UtcNow
+            };
+            context.PropertyViews.Add(view);
+            await context.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpPost]
