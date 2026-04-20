@@ -22,6 +22,8 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { apiClient } from "./api/client";
 import { useAuth } from "./AuthContext";
 
+import { jwtDecode } from 'jwt-decode';
+
 const CFaUserAlt = chakra(FaUserAlt);
 const CFaLock = chakra(FaLock);
 const CFaEnvelope = chakra(FaEnvelope);
@@ -166,7 +168,17 @@ export default function RegisterPage() {
                 duration: 4000,
                 isClosable: true,
             });
-            navigate("/"); // Redirect to homepage
+            try {
+                const decoded = jwtDecode(token);
+                const role = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || decoded.role || 'Tenant';
+                if (role === 'Landlord' || role === 'Owner') {
+                    navigate("/landlord-dashboard");
+                } else {
+                    navigate("/tenant-dashboard");
+                }
+            } catch (e) {
+                navigate("/");
+            }
         } catch (error) {
             toast({
                 title: "Regisztrációs hiba",

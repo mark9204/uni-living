@@ -17,9 +17,13 @@ UniLiving is a full-stack web application developed as a diploma project at Pann
 - **Property Management**: Create, edit, and browse property listings with detailed information
 - **User Authentication**: Secure JWT-based authentication system
 - **User Profiles**: Manage personal information and view rental history
+- **Real-time Chat**: In-app messaging between tenants and property owners using SignalR
+- **Notifications**: Comprehensive updates on activities and messages
+- **Favorites & Preferences**: Save properties and configure personalized search filters
+- **Admin Dashboard**: System analytics and audit logs for administrators
 - **Rating System**: Rate and review users to build trust in the community
 - **Image Uploads**: Support for property photos and user avatars
-- **Responsive Design**: Modern, mobile-friendly interface
+- **Responsive Design**: Modern, mobile-friendly interface with Chakra UI
 
 ## 🏗️ Architecture
 
@@ -43,17 +47,20 @@ uni-living/
 
 ### Backend
 - **Framework**: ASP.NET Core 8.0
-- **ORM**: Entity Framework Core with MySQL
+- **ORM**: Entity Framework Core 9 with SQL Server
 - **Authentication**: JWT Bearer tokens with ASP.NET Identity
+- **Real-time**: SignalR for live messaging
 - **API**: RESTful API architecture
 
 ### Frontend
 - **Library**: React 18+
+- **UI Framework**: Chakra UI & Framer Motion
 - **Build Tool**: Vite
 - **Routing**: React Router
+- **Real-time**: @microsoft/signalr
 
 ### Database
-- **DBMS**: MySQL
+- **DBMS**: SQL Server
 - **Migrations**: EF Core Migrations
 
 ## 📚 API Endpoints
@@ -72,10 +79,18 @@ uni-living/
 ### Users
 - `GET /api/user/{id}` - Get user profile
 - `PUT /api/user/{id}` - Update user profile (authenticated)
+- `GET /api/preferences` - Manage search preferences and favorites
+
+### Communication & Activity
+- `GET /api/chat` - Real-time messaging and chat rooms (via SignalR hub)
+- `GET /api/notifications` - User event notifications
 
 ### Ratings
 - `POST /api/userrating` - Rate a user (authenticated)
 - `GET /api/userrating/{userId}` - Get user ratings
+
+### Dashboard & Analytics
+- `GET /api/dashboard/...` - System statistics and audit logs for admin users
 
 ## 🎓 Academic Context
 

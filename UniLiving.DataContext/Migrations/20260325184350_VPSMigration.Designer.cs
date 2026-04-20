@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UniLiving.DataContext;
 
@@ -11,9 +12,11 @@ using UniLiving.DataContext;
 namespace UniLiving.DataContext.Migrations
 {
     [DbContext(typeof(UniDBContext))]
-    partial class UniDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260325184350_VPSMigration")]
+    partial class VPSMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -596,30 +599,6 @@ namespace UniLiving.DataContext.Migrations
                     b.ToTable("PropertyImages");
                 });
 
-            modelBuilder.Entity("UniLiving.DataContext.Entities.PropertyView", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("PropertyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ViewedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PropertyId");
-
-                    b.ToTable("PropertyViews");
-                });
-
             modelBuilder.Entity("UniLiving.DataContext.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -1111,17 +1090,6 @@ namespace UniLiving.DataContext.Migrations
                     b.Navigation("Property");
                 });
 
-            modelBuilder.Entity("UniLiving.DataContext.Entities.PropertyView", b =>
-                {
-                    b.HasOne("UniLiving.DataContext.Entities.Property", "Property")
-                        .WithMany("Views")
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Property");
-                });
-
             modelBuilder.Entity("UniLiving.DataContext.Entities.RefreshToken", b =>
                 {
                     b.HasOne("UniLiving.DataContext.Entities.User", "User")
@@ -1212,8 +1180,6 @@ namespace UniLiving.DataContext.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("Images");
-
-                    b.Navigation("Views");
                 });
 
             modelBuilder.Entity("UniLiving.DataContext.Entities.PropertyCategory", b =>
