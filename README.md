@@ -90,7 +90,7 @@ This project is developed for academic purposes.
 
 ## 👄 Author
 
-��Mark** - [@mark9204](https://github.com/mark9204)
+**Mark** - [@mark9204](https://github.com/mark9204)
 
 ## 📞 Contact
 
