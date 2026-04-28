@@ -11,5 +11,7 @@ namespace UniLiving.DataContext.DTOs
         public string Message { get; set; } = string.Empty;
         public bool IsRead { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int? RelatedEntityId { get; set; }
+        public string? RelatedEntityType { get; set; }
     }
 }

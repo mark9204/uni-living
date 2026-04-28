@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useToast, Alert, AlertIcon, Box, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import { useAuth } from './AuthContext';
 import { apiClient } from './api/client';
 import { createChatConnection } from './api/chatHub';
@@ -9,6 +11,8 @@ export const useNotifications = () => useContext(NotificationContext);
 
 export const NotificationProvider = ({ children }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -37,6 +41,38 @@ export const NotificationProvider = ({ children }) => {
           if (isMounted) {
             setNotifications((prev) => [notification, ...prev]);
             setUnreadCount((prev) => prev + 1);
+
+            toast({
+              position: 'bottom-right',
+              duration: 5000,
+              isClosable: true,
+              render: ({ onClose }) => (
+                <Alert 
+                  status="info" 
+                  variant="solid" 
+                  borderRadius="md" 
+                  boxShadow="lg"
+                  cursor="pointer" 
+                  onClick={() => {
+                    onClose();
+                    // Navigate based on type
+                    if (notification.relatedEntityType === 'Message' || notification.type === 'Message') {
+                      navigate('/chats');
+                    } else if (notification.relatedEntityType === 'PropertyAlert' || notification.type === 'PropertyAlert') {
+                      navigate(`/property/${notification.relatedEntityId || notification.linkId}`);
+                    }
+                  }}
+                >
+                  <AlertIcon />
+                  <Box flex="1">
+                    <AlertTitle>{notification.title || "Új értesítés"}</AlertTitle>
+                    <AlertDescription display="block">
+                      {notification.message}
+                    </AlertDescription>
+                  </Box>
+                </Alert>
+              ),
+            });
           }
         });
 

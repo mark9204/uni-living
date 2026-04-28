@@ -1,4 +1,4 @@
-# UniLiving 🏠
+﻿# UniLiving 🏘
 
 > A modern web platform for university students to find, list, and manage accommodation rentals.
 
@@ -9,86 +9,78 @@
 ## 📋 About
 
 UniLiving is a full-stack web application developed as a diploma project at Pannon University. The platform connects university students seeking accommodation with property owners offering rentals, providing a trusted marketplace specifically tailored for the student community.
-
-**Development Status:** 🚧 Active Development
+**Development Status:** 🦧 Active Development
 
 ## ✨ Features
 
 - **Property Management**: Create, edit, and browse property listings with detailed information
-- **User Authentication**: Secure JWT-based authentication system
-- **User Profiles**: Manage personal information and view rental history
+- **User Authentication**: Secure JWT-based authentication
+- **User Profiles**: Manage personal information, upload avatars, and manage properties
+- **Search & Preferences**: Advanced search capabilities, save search preferences, and favorite properties
+- **Real-Time Chat**: Live messaging between students and property owners over SignalR
+- **Notifications**: Asynchronous alerts and notifications
 - **Rating System**: Rate and review users to build trust in the community
-- **Image Uploads**: Support for property photos and user avatars
-- **Responsive Design**: Modern, mobile-friendly interface
+- **Dashboard & Analytics**: System platform statistics and user dashboards
+- **Responsive Design**: Modern, mobile-friendly interface built with Chakra UI
 
-## 🏗️ Architecture
+## 🎷菽 Architecture
 
-The project follows a clean, modular architecture with clear separation of concerns:
+The project follows a Clean Architecture inspired modular design with clear separation of concerns (DTO pattern, Repository/Services isolation):
 
-```
+``b
 uni-living/
-├── UniLiving/                  # ASP.NET Core Web API
-│   └── Controllers/           # API endpoints
-├── UniLiving.DataContext/     # Data layer
-│   ├── Context/              # EF Core DbContext
-│   ├── Entities/             # Database models
-│   ├── DTOs/                 # Data transfer objects
-│   └── Migrations/           # Database migrations
-├── UniLiving.Services/        # Business logic layer
-└── UniLiving.Frontend/        # React + Vite frontend
-    └── src/                  # React components and pages
-```
+☜╠╠ UniLiving/                  # ASP.NET Core Web API (Controllers, SignalR Hubs)
+☜▀▀ UniLiving.DataContext/     # Data layer (EF Core DbContext, Entities, DTOs, Migrations)
+☜▀▀ UniLiving.Services/        # Business logic layer (Services, AutoMapper Profiles)
+☔╠╠ UniLiving.Frontend/        # React + Vite frontend
+    └▀▀ src/                   # React components (Chakra UI)
+`b`
 
-## 🛠️ Tech Stack
+## 🚀菽 Tech Stack
 
 ### Backend
 - **Framework**: ASP.NET Core 8.0
-- **ORM**: Entity Framework Core with MySQL
-- **Authentication**: JWT Bearer tokens with ASP.NET Identity
-- **API**: RESTful API architecture
+- **ORM**: Entity Framework Core 9.0
+- **Database**: SQL Server
+- **Authentication**: Custom JWT Bearer tokens
+- **Real-Time Communication'(*: SignalR (WebSockets)
+- **ObjectMapping**: AutoMapper
+- **API Documentation**: OpenAPI / Swagger
 
 ### Frontend
-- **Library**: React 18+
+- **Framework**: React 18+
 - **Build Tool**: Vite
+- **UI Architecture**: Chakra UI component library
 - **Routing**: React Router
 
-### Database
-- **DBMS**: MySQL
-- **Migrations**: EF Core Migrations
+## 📚 Core API Endpoints & Modules
 
-## 📚 API Endpoints
+### Authentication & Users
+- `/api/auth` - Register, login, verification, token refresh
+- `/api/user` - View and manage user profiles and avatars
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
+### Properties & Search
+- `/api/property` - CRUD operations for listings and images
+- `/api/preferences` - User property search preferences
+- `api/dashboard` - Global platform statistics
 
-### Properties
-- `GET /api/property` - Get all properties
-- `GET /api/property/{id}` - Get property by ID
-- `POST /api/property` - Create new property (authenticated)
-- `PUT /api/property/{id}` - Update property (authenticated)
-- `DELETE /api/property/{id}` - Delete property (authenticated)
+### Engagement & Interaction
+- `/api/chat` & `ChatHub` - Live user messaging
+- `/api/notifications` - Alert lifecycle management
+- `/api/userrating` - Community scoring system
 
-### Users
-- `GET /api/user/{id}` - Get user profile
-- `PUT /api/user/{id}` - Update user profile (authenticated)
-
-### Ratings
-- `POST /api/userrating` - Rate a user (authenticated)
-- `GET /api/userrating/{userId}` - Get user ratings
-
-## 🎓 Academic Context
+## 🎃 Academic Context
 
 **Institution**: Pannon University  
 **Faculty**: Technical Informatics  
 **Program**: Software Engineering BSc  
 **Project Type**: Diploma Thesis
 
-## 📝 Project Status
+## 🎝 Project Status
 
 This project is currently under active development. Features and functionality are being continuously added and improved.
 
-## 🤝 Contributing
+## 🦍 Contributing
 
 As this is a diploma project, external contributions are not currently accepted. However, feedback and suggestions are welcome!
 
@@ -96,9 +88,9 @@ As this is a diploma project, external contributions are not currently accepted.
 
 This project is developed for academic purposes.
 
-## 👤 Author
+## 👄 Author
 
-**Mark** - [@mark9204](https://github.com/mark9204)
+��Mark** - [@mark9204](https://github.com/mark9204)
 
 ## 📞 Contact
 

@@ -207,8 +207,8 @@ const ChatsPage = () => {
                 </Text>
                 <Text color={secondaryTextColor}>
                   {user.role === 'Tenant' 
-                    ? 'Vegye fel a kapcsolatot egy tulajdonossal egy lakás oldalán!' 
-                    : 'Várjon, amíg valaki felveszi Önnel a kapcsolatot.'
+                    ? 'Vedd fel a kapcsolatot egy tulajdonossal egy lakás oldalán!' 
+                    : 'Várj, amíg valaki felveszi Veled a kapcsolatot.'
                   }
                 </Text>
                 {user.role === 'Tenant' && (
